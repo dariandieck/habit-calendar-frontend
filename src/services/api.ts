@@ -2,7 +2,7 @@ import type {Habit} from '../types/habit';
 import type {Day} from "../types/day.ts";
 import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
 
-export const BASE_URL = 'https://test-web-app-1-b9fafuhvgxgsh3d7.germanywestcentral-01.azurewebsites.net/v1git ';
+export const BASE_URL = 'https://test-web-app-1-b9fafuhvgxgsh3d7.germanywestcentral-01.azurewebsites.net/v1';
 
 export async function addHabits(habits: Habit[]): Promise<void> {
     const res = await fetch(`${BASE_URL}/habits`, {
