@@ -1,4 +1,10 @@
 {
+  "routes": [
+    {
+      "route": "/*",
+      "rewrite": "/index.html"
+    }
+  ],
   "mimeTypes": {
     ".js": "text/javascript",
     ".mjs": "text/javascript",
