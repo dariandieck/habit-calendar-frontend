@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+    @keyframes rainbow-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    --animate-rainbow-spin: rainbow-spin 3s linear infinite;
+}
+
+/* Der Layer, der den Kasten-Effekt verhindert */
+.rainbow-container {
+    mask-image: linear-gradient(#fff, #fff), linear-gradient(#fff, #fff);
+    mask-clip: padding-box, border-box;
+    mask-composite: intersect;
+}
