@@ -120,16 +120,32 @@ export function HabitInputForm({ onSubmit }: Props) {
                                 errors[i]?.description ? "border-red-300 bg-red-50" : "border-pink-100 bg-white focus:border-pink-400"
                             }`}
                         />
-                        <button
-                            type="button"
-                            onClick={() => removeHabit(i)}
-                            className="p-3 hover:bg-red-100 rounded-full
-                            flex items-center justify-center transition-all active:scale-70"
-                        >➖</button>
-                    </div>
 
+                        <div className="sm:hidden flex justify-center mt-2 w-full">
+                            <button
+                                type="button"
+                                onClick={() => removeHabit(i)}
+                                className="flex items-center gap-2 px-6 py-2 bg-white border-2 border-pink-200
+                                    text-pink-400 rounded-full text-sm font-bold shadow-sm
+                                    hover:bg-pink-50 transition-all active:scale-90"
+                            >
+                                <span>Habit entfernen</span>
+                                <span className="text-lg">➖</span>
+                            </button>
+                        </div>
+
+                        <div className="hidden sm:block lg:block flex items-center align-middle justify-center m-auto">
+                            <button
+                                type="button"
+                                onClick={() => removeHabit(i)}
+                                className="p-3 text-lg hover:bg-red-100 rounded-full transition-all active:scale-70"
+                            >➖</button>
+                        </div>
+
+                    </div>
                 </div>
             ))}
+
             <div className="flex justify-center mt-2">
                 <button
                     type="button"

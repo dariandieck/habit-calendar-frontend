@@ -1,17 +1,17 @@
 export function WelcomeComponent() {
     return (
         <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-pink-500 mb-6 drop-shadow-sm">
+            <h1 className="text-3xl font-bold text-pink-500 mb-8 drop-shadow-sm">
                 ✨ Willkommen ✨ zu deinem Daily Habit Kalender 💫
             </h1>
-            <div className="space-y-4 text-gray-600 leading-relaxed">
+            <div className="space-y-7 text-gray-600 leading-relaxed">
                 <p>
                     In diesem Kalender geht es darum, deine Gewohnheiten zu erfassen,
                     diese täglich zu bewerten und zu reflektieren 🧸🌸
                 </p>
                 <p className="bg-pink-100/50 p-4 rounded-2xl italic">
-                    🦄 Das hilft dir bei deiner Reise, wieder Kontrolle zu erlangen und schlechte Angewohnheiten bleiben zu
-                    lassen 👑💅💗 (slay queen)
+                    🦄 Das unterstützt dich auf deinem Weg, die Kontrolle zurückzugewinnen: Lege schlechte
+                    Muster ab und festige aktiv neue, positive Gewohnheiten 💗👑💅 (slay queen)
                 </p>
                 <p className="font-medium text-pink-400">
                     💌 Welche Habits möchtest du täglich bewerten? 💞
