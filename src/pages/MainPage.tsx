@@ -69,13 +69,18 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
     };
 
     return (
-        <>
-            <h1>Tägliche Bewertung</h1>
-            <DayForm habits={habits} onSubmit={handleSubmit}/>
-            <div>
-                <h3>Motivational Speech</h3>
-                <p>{motivationalSpeech.speech}</p>
+        <div className="flex justify-center items-start p-4">
+            <div className="w-full max-w-2xl bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-xl border border-pink-100">
+                <h1 className="text-3xl font-bold text-pink-500 mb-8 text-center drop-shadow-sm">
+                    ✨ Tägliche Bewertung ✨
+                </h1>
+                <div className="mb-4">
+                    <p className="text-gray-500 leading-relaxed">
+                        Bewerte jeden deiner Habits heute auf einer Skala von 1-100 💘
+                    </p>
+                </div>
+                <DayForm habits={habits} motivationalSpeech={motivationalSpeech} onSubmit={handleSubmit}/>
             </div>
-        </>
+        </div>
     )
 }

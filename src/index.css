@@ -8,9 +8,13 @@
     --animate-rainbow-spin: rainbow-spin 3s linear infinite;
 }
 
-/* Der Layer, der den Kasten-Effekt verhindert */
-.rainbow-container {
-    mask-image: linear-gradient(#fff, #fff), linear-gradient(#fff, #fff);
-    mask-clip: padding-box, border-box;
-    mask-composite: intersect;
+.animation-delay-300 {
+    animation-delay: 300ms;
+}
+
+@theme {
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
 }

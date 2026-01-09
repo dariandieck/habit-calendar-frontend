@@ -36,7 +36,7 @@ export default function AppRoutes() {
 
     // init: check if there are already habits in the backend
     useEffect(() => {
-        (async () => {
+        const tryLoadHabitsFromBackend = async () => {
             try {
                 const habits = await getHabits();
                 setHabits(habits);
@@ -49,6 +49,27 @@ export default function AppRoutes() {
                     ...prev,
                     isHabits: true
                 }));
+            }
+        };
+        const generateSynthHabitsForDev = () => {
+            // const synthHabits: Habit[] = [
+            //     {description: "Test habit1", h_id: 0, name: "habit1"},
+            //     {description: "Test habit2", h_id: 1, name: "Sport"},
+            //     {description: "Test habit3", h_id: 2, name: "Wasser trinken"}
+            // ];
+            // setHabits(synthHabits);
+            //setHabits([]);
+            console.log(`Generated ${habits.length} habits for dev.`);
+            setIsLoaded(prev => ({
+                ...prev,
+                isHabits: true
+            }));
+        }
+        (async () => {
+            if (import.meta.env.DEV) {
+                generateSynthHabitsForDev();
+            } else if (import.meta.env.PROD) {
+                await tryLoadHabitsFromBackend();
             }
         })();
     }, []);

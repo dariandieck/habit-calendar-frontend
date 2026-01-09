@@ -30,7 +30,7 @@ export function WelcomePage({setHabits}: WelcomePageProps) {
         }
     }
 
-    // 💖✨🌸🌷🍓🦄🐰🐱🐣🍑🍒🍦🧁🍉💞💌🌈🎀👑💅💗💘💫🐶🍼🍬🍭🫧💟🩷🩰🧸🥰🥺🚰💧💦🌊🥤🔫🚿'
+    //EMOJIS 💖✨🌸🌷🍓🦄🐰🐱🐣🍑🍒🍦🧁🍉💞💌🌈🎀👑💅💗💘💞🐶🍼🍬🍭🫧💟🩷🩰🧸🥰🥺🚰💧💦🌊🥤🔫🚿'😴🛏️🛌💤
 
     return (
         <div className="flex justify-center items-start sm:items-center min-h-[80vh] p-4">

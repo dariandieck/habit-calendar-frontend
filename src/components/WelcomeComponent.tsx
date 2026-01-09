@@ -2,7 +2,7 @@ export function WelcomeComponent() {
     return (
         <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-pink-500 mb-6 drop-shadow-sm">
-                ✨ Willkommen ✨ zu deinem Daily Habit Kalender 💅
+                ✨ Willkommen ✨ zu deinem Daily Habit Kalender 💫
             </h1>
             <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
@@ -20,9 +20,9 @@ export function WelcomeComponent() {
                 <div className="text-left bg-white p-6 rounded-2xl border border-pink-50 shadow-sm">
                     <p className="font-semibold mb-2 text-purple-400">Beispiele könnten sein:</p>
                     <ol className="list-none space-y-1 ml-2">
-                        <li>💧 Genug trinken </li>
-                        <li>🦄 <span className="text-purple-500">Nicht</span> an Fingernägeln kauen</li>
-                        <li>🍬 Gesund essen / keine Süßigkeiten</li>
+                        <li>💧 Genug trinken</li>
+                        <li>💤 Ausreichend schlafen</li>
+                        <li>💅 Gesunde Fingernägel :)</li>
                     </ol>
                 </div>
 

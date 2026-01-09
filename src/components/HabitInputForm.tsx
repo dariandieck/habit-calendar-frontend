@@ -15,6 +15,7 @@ type ErrorState = {
 export function HabitInputForm({ onSubmit }: Props) {
     const [habits, setHabits] = useState<Habit[]>([{ name: "", description: "" }]);
     const [errors, setErrors] = useState<ErrorState>({});
+    const [isSaving, setIsSaving] = useState(false);
 
     // fügt einen neuen leeren Habit hinzu
     function addEmptyHabit() {
@@ -86,7 +87,12 @@ export function HabitInputForm({ onSubmit }: Props) {
             return;
         }
 
-        onSubmit(cleaned);
+        setIsSaving(true);
+
+        setTimeout(() => {
+            onSubmit(cleaned);
+            setIsSaving(false);
+        }, 2000);
     }
 
     return (
@@ -139,31 +145,39 @@ export function HabitInputForm({ onSubmit }: Props) {
 
 
             <div className="relative group mt-8 w-full h-[64px] flex items-center justify-center">
-                {/* DER REGENBOGEN-KREISEL */}
-                {/* Wir machen ihn quadratisch und sehr groß (aspect-square), damit er beim Drehen alles abdeckt */}
+
+                {/* DER REGENBOGEN-KREISEL (Jetzt auch aktiv wenn isSaving wahr ist) */}
                 <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square
-                          bg-[conic-gradient(from_0deg,#ff0000,#ff8000,#ffff00,#00ff00,#00ffff,#0000ff,#8000ff,#ff00ff,#ff0000)]
-                          opacity-0 group-hover:opacity-100 group-hover:animate-rainbow-spin transition-opacity duration-500 blur-sm">
+                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square 
+      bg-[conic-gradient(from_0deg,#ff0000,#ff8000,#ffff00,#00ff00,#00ffff,#0000ff,#8000ff,#ff00ff,#ff0000)] 
+      ${isSaving ? 'opacity-100 animate-[rainbow-spin_1s_linear_infinite] blur-md' : 'opacity-0 group-hover:opacity-100 group-hover:animate-rainbow-spin'} 
+      transition-all duration-500`}>
                     </div>
                 </div>
 
-                {/* DIE "MASKE" (Erzeugt den Abstand zwischen Regenbogen und Button) */}
-                <div className="absolute inset-[6px] bg-pink-50 rounded-[14px] z-10 group-hover:bg-transparent transition-colors"></div>
-
-                {/* DER EIGENTLICHE BUTTON */}
+                {/* DER BUTTON */}
                 <button
                     type="button"
+                    disabled={isSaving}
                     onClick={submitHabits}
-                    className="relative z-20 w-[calc(100%-4px)] h-[calc(100%-4px)] bg-linear-to-r from-pink-600 to-purple-600
-                      text-white font-bold rounded-[14px] shadow-lg
-                      transition-all duration-300
-                      group-hover:scale-[0.99] group-active:scale-98
-                      flex items-center justify-center gap-2"
+                    className={`relative z-20 w-[calc(100%-8px)] h-[calc(100%-8px)] 
+      ${isSaving ? 'bg-white text-pink-500' : 'bg-linear-to-r from-pink-600 to-purple-800 text-white'}
+      font-bold rounded-[14px] shadow-lg transition-all duration-500
+      flex items-center justify-center gap-3 overflow-hidden`}
                 >
-                    <span className="group-hover:animate-bounce">✨</span>
-                    <span>Speichern</span>
-                    <span className="group-hover:animate-bounce">✨</span>
+                    {isSaving ? (
+                        <>
+                            <span className="animate-bounce">💖</span>
+                            <span className="tracking-widest uppercase text-sm">Wird gespeichert...</span>
+                            <span className="animate-bounce">💖</span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="group-hover:animate-bounce">✨</span>
+                            <span>Speichern</span>
+                            <span className="group-hover:animate-bounce">✨</span>
+                        </>
+                    )}
                 </button>
             </div>
         </div>

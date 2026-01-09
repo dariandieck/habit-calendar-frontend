@@ -91,7 +91,7 @@ export async function addToSyncQueue(endpoint: string, payload: SyncPayload) {
     const db = await getDB();
     const tx = db.transaction(SYNC_STORE, 'readwrite');
     await tx.store.add({
-        endpoint: BASE_URL + endpoint,
+        endpoint: BASE_URL() + endpoint,
         payload: payload
     });
     await tx.done;
