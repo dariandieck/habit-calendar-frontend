@@ -5,7 +5,7 @@ export const BASE_URL = () => {
     if (import.meta.env.DEV) {
         return 'http://localhost:8080/v1';
     } else if (import.meta.env.PROD) {
-        return 'https://test-web-app-1-b9fafuhvgxgsh3d7.germanywestcentral-01.azurewebsites.net/v1';
+        return 'https://test-dd-web-app-backend-c4evgedrd9facah5.germanywestcentral-01.azurewebsites.net/v1';
     }
 };
 
