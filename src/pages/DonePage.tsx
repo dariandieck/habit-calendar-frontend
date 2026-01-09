@@ -40,7 +40,7 @@ export function DonePage() {
                 <p className="text-gray-600 leading-relaxed italic">
                     Super gemacht! Du hast deinen Tag heute erfolgreich reflektiert.
                     <br /><br />
-                    Warte geduldig ab, du kannst morgen wieder bewerten 💞💫
+                    Warte bis morgen ab :) Dann kannst du wieder bewerten! 💞💫
                 </p>
 
                 <div className="mt-8 flex justify-center gap-2 text-pink-800">

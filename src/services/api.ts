@@ -11,6 +11,8 @@ export const BASE_URL = () => {
 
 
 import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
+import type {EmailResponse} from "../types/emailResponse.ts";
+import type {Entry} from "../types/entry.ts";
 
 export async function addHabits(habits: Habit[]): Promise<void> {
     const res = await fetch(`${BASE_URL()}/habits`, {
@@ -68,6 +70,22 @@ export async function getCurrentDay(): Promise<Day> {
 
     if (!res.ok) {
         throw new Error('Fehler beim laden des current days');
+    }
+
+    return await res.json();
+}
+
+export async function sendEmail(dbDay: Day, entries: Entry[]): Promise<EmailResponse> {
+    const res = await fetch(`${BASE_URL()}/sendemail`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({day: dbDay, entries: entries})
+    });
+
+    if (!res.ok) {
+        throw new Error('Fehler beim senden der email');
     }
 
     return await res.json();

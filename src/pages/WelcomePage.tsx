@@ -18,10 +18,9 @@ export function WelcomePage({setHabits}: WelcomePageProps) {
             await addHabits(habits); // habits im backend speichern
             const db_habits_with_id: Habit[] = await getHabits()
             setHabits(db_habits_with_id) // set habits local for session (nicht indexedDB, nur im code)
-            alert('Habits gespeichert 💖🧸🥰🥺');
+            alert('Habits gespeichert! 💖🧸🥰🥺');
             console.log(`Saved ${habits.length} habits in the backend. Going to main page.`);
             navigate(MAIN_PAGE); // geht zur Hauptseite
-            // send email here
         } catch (error) {
             console.log("Error adding habit to the backend db:");
             console.error(error);

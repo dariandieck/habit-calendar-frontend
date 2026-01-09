@@ -5,11 +5,12 @@ import type {Habit} from "../types/habit.ts";
 import {DONE_PAGE} from "../App.tsx";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {getMotivationalSpeech} from "../services/api.ts";
+import {getMotivationalSpeech, sendEmail} from "../services/api.ts";
 import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
 import type {Entry} from "../types/entry.ts";
 import {syncWithBackend} from "../services/sync.ts";
 import type {DayKeyFields} from "../types/dayKeyFields.ts";
+import type {EmailResponse} from "../types/emailResponse.ts";
 
 
 interface MainPageProps {
@@ -62,15 +63,22 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
         setCurrentDay(dbDay);
         // TODO hier muss geschaut werden, dass beim routing nicht nur die
         // TODO db backend abgefragt wird, sondern auch local (indexedDB) falls offline
-        alert('Dein Tag wurde gespeichert EMOJI');
+        alert('Tag gespeichert! 💖🧸🥰🥺');
         console.log(`Day saved for the day "${today}". Navigating to done page.`);
         navigate(DONE_PAGE); // geht zur Done page
-        // send email here
+        const sendEmailResponse: EmailResponse = await sendEmail(dbDay, entries);
+        if (sendEmailResponse.success) {
+            console.log("Successfully sent confirmation email");
+        } else {
+            console.log("Did not send confirmation email. Error:");
+            console.error(sendEmailResponse.message)
+        }
     };
 
     return (
         <div className="flex justify-center items-start p-4">
-            <div className="w-full max-w-2xl bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-xl border border-pink-100">
+            <div className="w-full max-w-2xl bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-3xl
+                shadow-xl border border-pink-100">
                 <h1 className="text-3xl font-bold text-pink-500 mb-8 text-center drop-shadow-sm">
                     ✨ Tägliche Bewertung ✨
                 </h1>
