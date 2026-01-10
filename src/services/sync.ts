@@ -1,4 +1,4 @@
-import { getSyncQueue } from './db';
+import {clearAllData, getSyncQueue} from './db';
 import { removeFromSyncQueue } from './db';
 import type {SyncItem} from "../types/syncpayload.ts";
 
@@ -25,12 +25,12 @@ export async function syncWithBackend() {
 
             if (res.ok) {
                 // Erfolgreich gesendet → aus Queue entfernen
-                await removeFromSyncQueue(item.q_id);
+                await removeFromSyncQueue(item.indexed_db_q_id);
                 // And here at least one item was synced to the backend, so it was "performed"
                 performed = true;
             } else {
                 console.warn(
-                    `Sync fehlgeschlagen für queueId ${item.q_id}, Status: ${res.status}`
+                    `Sync fehlgeschlagen für queueId ${item.indexed_db_q_id}, Status: ${res.status}`
                 );
                 console.warn(`item: ${JSON.stringify(item)}`);
                 // Breche Schleife ab, damit wir es später nochmal versuchen
@@ -38,12 +38,17 @@ export async function syncWithBackend() {
             }
         } catch (err) {
             console.error(
-                `Sync Fehler für queueId ${item.q_id}:`,
+                `Sync Fehler für queueId ${item.indexed_db_q_id}:`,
                 (err as Error).message
             );
             // Offline oder Netzwerkfehler → Schleife abbrechen, retry beim nächsten Online
             break;
         }
+    }
+
+    if (performed) {
+        await clearAllData();
+        window.location.reload();
     }
     return performed;
 }

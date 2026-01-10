@@ -1,7 +1,7 @@
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { syncWithBackend } from './services/sync';
 import { useEffect, useState } from "react";
-import { clearAllData } from "./services/db.ts";
+import {getLocalDays} from "./services/db.ts";
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import {getCurrentDay, getHabits} from "./services/api.ts";
 import type {Habit} from "./types/habit.ts";
@@ -26,15 +26,7 @@ export default function AppRoutes() {
     const online = useOnlineStatus();
     const location = useLocation();
 
-    // init: clear indexedDB
-    useEffect(() => {
-        (async () => {
-            await clearAllData();
-        })();
-        console.log("cleared indexedDB");
-    }, []);
-
-    // init: check if there are already habits in the backend
+    // init: check if there are already habits in the backend or indexdb
     useEffect(() => {
         const tryLoadHabitsFromBackend = async () => {
             try {
@@ -52,13 +44,13 @@ export default function AppRoutes() {
             }
         };
         const generateSynthHabitsForDev = () => {
-            // const synthHabits: Habit[] = [
-            //     {description: "Test habit1", h_id: 0, name: "habit1"},
-            //     {description: "Test habit2", h_id: 1, name: "Sport"},
-            //     {description: "Test habit3", h_id: 2, name: "Wasser trinken"}
-            // ];
-            // setHabits(synthHabits);
-            //setHabits([]);
+            const synthHabits: Habit[] = [
+                {description: "Test habit1", h_id: 0, name: "habit1"},
+                {description: "Test habit2", h_id: 1, name: "Sport"},
+                {description: "Test habit3", h_id: 2, name: "Wasser trinken"}
+            ];
+            setHabits(synthHabits);
+            setHabits([]);
             console.log(`Generated ${habits.length} habits for dev.`);
             setIsLoaded(prev => ({
                 ...prev,
@@ -78,12 +70,22 @@ export default function AppRoutes() {
     useEffect(() => {
         (async () => {
             try {
-                const day = await getCurrentDay();
-                if(day !== null) { // so if there is a day entry (it's not null)
+                const today: string = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+                const localDays: Day[] = await getLocalDays();
+                const filtered: Day[] = localDays.filter(d => d.day === today);
+                let day = filtered.length === 1 ? filtered[0] : null;
+                if (day !== null) {
                     setCurrentDay(day)
-                    console.log(`Loaded a day entry for today: "${day.day}".`);
+                    console.log(`Loaded a day entry for today: "${day.day}" from local indexedDB.`);
                 } else {
-                    console.log("No day entry for today found.");
+                    console.log("No day found in indexedDB. Looking in backend db now.")
+                    day = await getCurrentDay(today);
+                    if(day !== null) { // so if there is a day entry (it's not null)
+                        setCurrentDay(day)
+                        console.log(`Loaded a day entry for today: "${day.day}" from backend db.`);
+                    } else {
+                        console.log("No day entry for today found.");
+                    }
                 }
             } catch (err) {
                 console.log('Error while loading current Day. Is the backend offline?', )
@@ -98,17 +100,15 @@ export default function AppRoutes() {
     }, []);
 
     // online changed: sync with backend
-    /* eslint-disable */
     useEffect(() => {
         console.log(`User is now ${online ? 'online' : 'offline'}.`);
-        if (online && location.pathname !== WELCOME_PAGE) {
+        if (online) {
             (async () => {
                 const syncWasPerformed = await syncWithBackend();
-                if (syncWasPerformed) console.log(`Synced with backend. Current page is "${location.pathname}".`);
+                if (syncWasPerformed) console.log(`Synced with backend.`);
             })();
         }
     }, [online]);
-    /* eslint-enable */
 
     // pathname changed: log
     useEffect(() => {

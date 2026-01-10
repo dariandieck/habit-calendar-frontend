@@ -17,15 +17,13 @@ export function WelcomePage({setHabits}: WelcomePageProps) {
         try {
             await addHabits(habits); // habits im backend speichern
             const db_habits_with_id: Habit[] = await getHabits()
-            setHabits(db_habits_with_id) // set habits local for session (nicht indexedDB, nur im code)
-            alert('Habits gespeichert! 💖🧸🥰🥺');
+            setHabits(db_habits_with_id)
             console.log(`Saved ${habits.length} habits in the backend. Going to main page.`);
             navigate(MAIN_PAGE); // geht zur Hauptseite
         } catch (error) {
             console.log("Error adding habit to the backend db:");
             console.error(error);
             alert('Es gab einen kleinen Fehler (upsie! 💅). Frag Dari was los ist 🥺');
-            return;
         }
     }
 

@@ -58,9 +58,7 @@ export async function getMotivationalSpeech(date: string): Promise<MotivationalS
     return await res.json();
 }
 
-export async function getCurrentDay(): Promise<Day> {
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-
+export async function getCurrentDay(today: string): Promise<Day> {
     const res = await fetch(`${BASE_URL()}/days/date/${today}`, {
         method: 'GET',
         headers: {

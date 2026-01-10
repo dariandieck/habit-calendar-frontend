@@ -14,13 +14,16 @@ import type {EmailResponse} from "../types/emailResponse.ts";
 
 
 interface MainPageProps {
-    habits: Habit[]
+    habits: Habit[],
     setCurrentDay: (value: (((prevState: (Day | null)) => (Day | null)) | Day | null)) => void
 }
 
 export function MainPage({habits, setCurrentDay}: MainPageProps) {
     const navigate = useNavigate();
-    const [motivationalSpeech, setMotivationalSpeech] = useState<MotivationalSpeech>({day: "", speech: "konnte nicht geladen werden 🥺"});
+    const [motivationalSpeech, setMotivationalSpeech] = useState<MotivationalSpeech>({
+        day: "",
+        speech: "konnte nicht geladen werden 🥺"
+    });
 
     // load LLM motivational speech from backend
     useEffect(() => {
@@ -28,7 +31,7 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
             const today = new Date().toISOString().slice(0, 10);
             try {
                 const dbMotivationalSpeech = await getMotivationalSpeech(today)
-                if(dbMotivationalSpeech !== null) {
+                if (dbMotivationalSpeech !== null) {
                     setMotivationalSpeech(dbMotivationalSpeech)
                     console.log("Motivational Speech loaded from backend")
                 } else {
@@ -59,14 +62,17 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
         // save in indexedDB and then sync to backend
         await trySaveDayLocalAndSyncLaterOn(dbDay);
         await trySaveEntriesLocalAndSyncLaterOn(dbEntries);
-        await syncWithBackend();
         setCurrentDay(dbDay);
-        // TODO hier muss geschaut werden, dass beim routing nicht nur die
-        // TODO db backend abgefragt wird, sondern auch local (indexedDB) falls offline
-        alert('Tag gespeichert! 💖🧸🥰🥺');
+        const synced = await syncWithBackend();
+        if (synced) {
+            console.log("Synced new day with backend.")
+        } else {
+            console.log("Could not sync new day with backend. But the items are in the " +
+                "queue and should get synced later on!")
+        }
         console.log(`Day saved for the day "${today}". Navigating to done page.`);
         navigate(DONE_PAGE); // geht zur Done page
-        const sendEmailResponse: EmailResponse = await sendEmail(dbDay, entries);
+        const sendEmailResponse: EmailResponse = await sendEmail(dbDay, dbEntries);
         if (sendEmailResponse.success) {
             console.log("Successfully sent confirmation email");
         } else {

@@ -4,7 +4,7 @@ import type {Entry} from "./entry.ts";
 export type SyncPayload = Day | Entry[];
 
 export interface SyncItem {
-    q_id: number;
+    indexed_db_q_id: number;
     endpoint: string;
     payload: SyncPayload;
 }

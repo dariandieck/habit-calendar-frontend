@@ -1,12 +1,11 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type {Habit} from '../types/habit';
 import type {Entry} from "../types/entry.ts";
 import type {Day} from "../types/day.ts";
 import type { SyncPayload, SyncItem} from "../types/syncpayload.ts";
 import {BASE_URL} from "./api.ts";
 
 const DB_NAME = 'daily-calendar';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const DAY_STORE = 'days';
 const ENTRY_STORE = 'entries';
 const SYNC_STORE = 'syncQueue';
@@ -21,23 +20,21 @@ function getDB() {
                 // Days Store
                 if (!db.objectStoreNames.contains(DAY_STORE)) {
                     db.createObjectStore(DAY_STORE, {
-                        keyPath: 'd_id',
+                        keyPath: 'indexed_db_d_id',
                         autoIncrement: true,
                     });
                 }
-
                 // Entries Store
                 if (!db.objectStoreNames.contains(ENTRY_STORE)) {
                     db.createObjectStore(ENTRY_STORE, {
-                        keyPath: 'e_id',
-                        autoIncrement: true,
+                        keyPath: 'indexed_db_e_id',
+                        autoIncrement: true
                     });
                 }
-
                 // Sync Queue Store (Payloads, die noch ans Backend müssen)
                 if (!db.objectStoreNames.contains(SYNC_STORE)) {
                     db.createObjectStore(SYNC_STORE, {
-                        keyPath: 'q_id',
+                        keyPath: 'indexed_db_q_id',
                         autoIncrement: true,
                     });
                 }
@@ -47,18 +44,14 @@ function getDB() {
     return dbPromise;
 }
 
-// ---------------------------
-// --- Habits Funktionen ---
-// ---------------------------
-
 // Alle lokalen Days holen
-export async function getLocalDays(): Promise<Habit[]> {
+export async function getLocalDays(): Promise<Day[]> {
     const db = await getDB();
     return db.getAll(DAY_STORE);
 }
 
 // Alle lokalen Entries holen
-export async function getLocalEntries(): Promise<Habit[]> {
+export async function getLocalEntries(): Promise<Entry[]> {
     const db = await getDB();
     return db.getAll(ENTRY_STORE);
 }
@@ -104,10 +97,10 @@ export async function getSyncQueue(): Promise<SyncItem[]> {
 }
 
 // Einzelnes Item aus der Sync Queue löschen
-export async function removeFromSyncQueue(q_id: number) {
+export async function removeFromSyncQueue(indexed_db_q_id: number) {
     const db = await getDB();
     const tx = db.transaction(SYNC_STORE, 'readwrite');
-    await tx.store.delete(q_id);
+    await tx.store.delete(indexed_db_q_id);
     await tx.done;
 }
 
