@@ -48,7 +48,6 @@ export async function syncWithBackend() {
 
     if (performed) {
         await clearAllData();
-        window.location.reload();
     }
     return performed;
 }

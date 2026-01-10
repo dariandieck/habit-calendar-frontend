@@ -105,7 +105,10 @@ export default function AppRoutes() {
         if (online) {
             (async () => {
                 const syncWasPerformed = await syncWithBackend();
-                if (syncWasPerformed) console.log(`Synced with backend.`);
+                if (syncWasPerformed) {
+                    console.log(`Synced with backend.`);
+                    window.location.reload();
+                }
             })();
         }
     }, [online]);
