@@ -9,10 +9,15 @@ import {MainPage} from "./pages/MainPage.tsx";
 import {WelcomePage} from "./pages/WelcomePage.tsx";
 import {DonePage} from "./pages/DonePage.tsx";
 import type {Day} from "./types/day.ts";
+import {LoadingPage} from "./pages/LoadingPage.tsx";
+import type {LoginResponse} from "./types/loginResponse.ts";
+import {LoginPage} from "./pages/LoginPage.tsx";
 
 export const MAIN_PAGE: string = "/"
 export const WELCOME_PAGE: string = "/welcome"
 export const DONE_PAGE: string = "/done"
+export const LOGIN_PAGE: string = "/login"
+export const LOADING_PAGE: string = "/loading"
 
 type LoadingState = {
     isHabits: boolean;
@@ -22,6 +27,12 @@ type LoadingState = {
 export default function AppRoutes() {
     const [isLoaded, setIsLoaded] = useState<LoadingState>({isHabits: false, isDaySubmitted: false});
     const [habits, setHabits] = useState<Habit[]>([]);
+    const [loginTokenData, setLoginTokenData] = useState<LoginResponse>({
+        exp: "",
+        message: "",
+        success: false,
+        token: ""
+    })
     const [currentDay, setCurrentDay] = useState<Day | null>(null);
     const online = useOnlineStatus();
     const location = useLocation();
@@ -118,10 +129,17 @@ export default function AppRoutes() {
         console.log(`Navigated to route: "${location.pathname}".`);
     }, [location.pathname]);
 
+    const isJWTValid = () => {
+        const isValid: boolean = loginTokenData.success && loginTokenData.token !== "" && loginTokenData.exp !== ""
+        const expiryDate: Date = new Date(loginTokenData.exp);
+        const now: Date = new Date();
+        const isExpired: boolean = expiryDate.getTime() < now.getTime();
+        return isValid && !isExpired;
+    }
 
     if (!Object.values(isLoaded).some(Boolean)) {
         return (
-            <p>Loading...</p>
+            <LoadingPage />
         );
     }
 
@@ -131,11 +149,13 @@ export default function AppRoutes() {
             <Route
                 path={MAIN_PAGE}
                 element={
-                    currentDay !== null
-                    ? (<Navigate to={DONE_PAGE} replace />)
-                    : habits.length === 0
-                        ? (<Navigate to={WELCOME_PAGE} replace />)
-                        : (<MainPage habits={habits} setCurrentDay={setCurrentDay} />)
+                    !isJWTValid()
+                        ? (<Navigate to={LOGIN_PAGE} replace />)
+                        : currentDay !== null
+                            ? (<Navigate to={DONE_PAGE} replace />)
+                            : habits.length === 0
+                                ? (<Navigate to={WELCOME_PAGE} replace />)
+                                : (<MainPage habits={habits} setCurrentDay={setCurrentDay} />)
                 }
             />
 
@@ -143,11 +163,13 @@ export default function AppRoutes() {
             <Route
                 path={WELCOME_PAGE}
                 element={
-                    currentDay !== null
-                    ? (<Navigate to={DONE_PAGE} replace />)
-                    : habits.length === 0
-                        ? <WelcomePage setHabits={setHabits} />
-                        : (<Navigate to={MAIN_PAGE} replace />)
+                    !isJWTValid()
+                        ? (<Navigate to={LOGIN_PAGE} replace />)
+                        : currentDay !== null
+                            ? (<Navigate to={DONE_PAGE} replace />)
+                            : habits.length === 0
+                                ? <WelcomePage setHabits={setHabits} />
+                                : (<Navigate to={MAIN_PAGE} replace />)
 
                 }
             />
@@ -156,16 +178,32 @@ export default function AppRoutes() {
             <Route
                 path={DONE_PAGE}
                 element={
-                    currentDay !== null
-                        ? (<DonePage />)
-                        : habits.length === 0
-                            ? (<Navigate to={WELCOME_PAGE} replace />)
-                            : (<Navigate to={MAIN_PAGE} replace />)
+                    !isJWTValid()
+                        ? (<Navigate to={LOGIN_PAGE} replace />)
+                        : currentDay !== null
+                            ? (<DonePage />)
+                            : habits.length === 0
+                                ? (<Navigate to={WELCOME_PAGE} replace />)
+                                : (<Navigate to={MAIN_PAGE} replace />)
+                }
+            />
+
+            {/* Login Seite */}
+            <Route
+                path={LOGIN_PAGE}
+                element={
+                    !isJWTValid()
+                        ? (<LoginPage />)
+                        : currentDay !== null
+                            ? (<Navigate to={DONE_PAGE} replace />)
+                            : habits.length === 0
+                                ? (<Navigate to={WELCOME_PAGE} replace />)
+                                : (<Navigate to={MAIN_PAGE} replace />)
                 }
             />
 
             {/* Fallback */}
-            <Route path="*" element={<Navigate to={MAIN_PAGE} replace />} />
+            <Route path="*" element={<Navigate to={WELCOME_PAGE} replace />} />
         </Routes>
     );
 }

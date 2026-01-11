@@ -27,8 +27,9 @@ export function DonePage() {
     }, []);
 
     return (
-        <div className="flex justify-center items-center min-h-[60vh] p-4">
-            <div className="w-full max-w-md bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-pink-100 text-center animate-in fade-in zoom-in duration-700">
+        <div className="flex justify-center items-center p-4 ">
+            <div className="w-full max-w-md bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl
+                border border-pink-100 text-center">
                 <div className="text-6xl mb-6 animate-bounce">
                     👑
                 </div>

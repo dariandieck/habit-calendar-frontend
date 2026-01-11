@@ -1,5 +1,10 @@
 import type {Habit} from '../types/habit';
 import type {Day} from "../types/day.ts";
+import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
+import type {EmailResponse} from "../types/emailResponse.ts";
+import type {Entry} from "../types/entry.ts";
+import type {LoginData} from "../types/loginData.ts";
+import type {LoginResponse} from "../types/loginResponse.ts";
 
 export const BASE_URL = () => {
     if (import.meta.env.DEV) {
@@ -9,10 +14,20 @@ export const BASE_URL = () => {
     }
 };
 
+export async function login(loginData: LoginData): Promise<LoginResponse> {
+    const formData = new URLSearchParams();
+    formData.append('username', loginData.username);
+    formData.append('password', loginData.password);
 
-import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
-import type {EmailResponse} from "../types/emailResponse.ts";
-import type {Entry} from "../types/entry.ts";
+    const res = await fetch(`${BASE_URL()}/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData
+    });
+    return await res.json();
+}
 
 export async function addHabits(habits: Habit[]): Promise<void> {
     const res = await fetch(`${BASE_URL()}/habits`, {

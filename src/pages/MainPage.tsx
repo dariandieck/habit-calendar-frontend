@@ -83,13 +83,13 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
 
     return (
         <div className="flex justify-center items-start p-4">
-            <div className="w-full max-w-2xl bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-3xl
+            <div className="w-full max-w-2xl bg-white/80 backdrop-blur-xl p-6 md:p-10 rounded-3xl
                 shadow-xl border border-pink-100">
                 <h1 className="text-3xl font-bold text-pink-500 mb-8 text-center drop-shadow-sm">
                     ✨ Tägliche Bewertung ✨
                 </h1>
                 <div className="mb-4">
-                    <p className="text-gray-500 leading-relaxed">
+                    <p className="text-gray-500 leading-relaxed text-md">
                         Bewerte jeden deiner Habits heute auf einer Skala von 1-100 💘
                     </p>
                 </div>

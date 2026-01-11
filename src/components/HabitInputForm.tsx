@@ -108,16 +108,19 @@ export function HabitInputForm({ onSubmit }: Props) {
                             value={habit.name}
                             onChange={e => updateHabit(i, "name", e.target.value)}
                             placeholder={`Name ${i + 1}. Habit`}
-                            className={`w-full sm:flex-1 p-3 rounded-xl border-2 text-base transition-all outline-none focus:ring-2 focus:ring-pink-300 ${
-                                errors[i]?.name ? "border-red-300 bg-red-50" : "border-pink-100 bg-white focus:border-pink-400"}`}
+                            className={`w-full sm:flex-[2] p-3 rounded-xl border-2 text-base transition-all 
+                                outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 ${
+                                errors[i]?.name ? "border-red-300 bg-red-50":"border-pink-50 bg-white/50"
+                            }`}
                         />
                         <input
                             type="text"
                             value={habit.description}
                             onChange={e => updateHabit(i, "description", e.target.value)}
                             placeholder={`Beschreibung ${i + 1}. Habit`}
-                            className={`w-full sm:flex-[2] p-3 rounded-xl border-2 text-base transition-all outline-none focus:ring-2 focus:ring-pink-300 ${
-                                errors[i]?.description ? "border-red-300 bg-red-50" : "border-pink-100 bg-white focus:border-pink-400"
+                            className={`w-full sm:flex-[2] p-3 rounded-xl border-2 text-base transition-all 
+                                outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 ${
+                                errors[i]?.description ? "border-red-300 bg-red-50":"border-pink-50 bg-white/50"
                             }`}
                         />
 
@@ -177,9 +180,9 @@ export function HabitInputForm({ onSubmit }: Props) {
                     disabled={isSaving}
                     onClick={submitHabits}
                     className={`relative z-20 w-[calc(100%-8px)] h-[calc(100%-8px)] 
-      ${isSaving ? 'bg-white text-pink-500' : 'bg-linear-to-r from-pink-600 to-purple-800 text-white'}
-      font-bold rounded-[14px] shadow-lg transition-all duration-500
-      flex items-center justify-center gap-3 overflow-hidden`}
+                        ${isSaving ? 'bg-white text-pink-500' : 'bg-linear-to-r from-pink-400 to-purple-500 text-white'}
+                            font-bold rounded-[14px] shadow-lg transition-all duration-500
+                            flex items-center justify-center gap-3 overflow-hidden`}
                 >
                     {isSaving ? (
                         <>

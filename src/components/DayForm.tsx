@@ -53,8 +53,14 @@ export function DayForm({habits, onSubmit, motivationalSpeech}: Props) {
         setIsSaving(true);
 
         setTimeout(async () => {
-            await onSubmit(entries, formDay);
-            setIsSaving(false);
+            try {
+                await onSubmit(entries, formDay);
+            } catch (error) {
+                console.log(`Could not save the day. Error: ${error}`);
+                alert('Es gab einen kleinen Fehler (upsie! 💅). Frag Dari was los ist 🥺');
+            } finally {
+                setIsSaving(false)
+            }
         }, 2000);
     };
 
@@ -170,7 +176,7 @@ export function DayForm({habits, onSubmit, motivationalSpeech}: Props) {
                     disabled={isSaving}
                     onClick={handleSubmit}
                     className={`relative z-20 overflow-hidden w-[calc(100%-8px)] h-[calc(100%-8px)] 
-                        ${isSaving ? 'bg-white text-pink-500' : 'bg-linear-to-r from-pink-600 to-purple-800 text-white'}
+                        ${isSaving ? 'bg-white text-pink-500' : 'bg-linear-to-r from-pink-400 to-purple-500 text-white'}
                         font-bold rounded-[14px] shadow-lg transition-all duration-500
                         flex items-center justify-center gap-3 overflow-hidden`}
                 >

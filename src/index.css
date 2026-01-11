@@ -18,3 +18,18 @@
         100% { transform: translateX(100%); }
     }
 }
+
+@keyframes bounce-rotate {
+    0%, 100% {
+        transform: translateY(-25%) rotate(0deg);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateY(0) rotate(15deg); /* Leichte Drehung am tiefsten Punkt */
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+.animate-bounce-rotate {
+    animation: bounce-rotate 1s infinite;
+}
