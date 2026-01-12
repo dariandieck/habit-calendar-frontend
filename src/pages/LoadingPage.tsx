@@ -17,7 +17,9 @@ export function LoadingPage() {
             <div className="w-full max-w-md bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl
                 border border-pink-100 text-center">
                 <div className="relative mb-8 flex justify-center">
-                    <div className="absolute w-24 h-24 bg-pink-200 rounded-full blur-2xl animate-pulse opacity-60"></div>
+                    <div className="absolute w-24 h-24 bg-pink-200 rounded-full blur-2xl animate-pulse opacity-60">
+
+                    </div>
                     <div
                         key={currentIndex}
                         className="relative text-6xl animate-bounce z-10 transition-all"
@@ -26,7 +28,8 @@ export function LoadingPage() {
                     </div>
                 </div>
 
-                {/* EMOJIS 💖✨🌸🌷🍓🦄🐰🐱🐣🍑🍒🍦🧁🍉💞💌🌈🎀👑💅💗💘🐶🍼🍬🍭🫧💟🩷🩰🧸🥰🥺🚰💧💦🌊🥤🔫🚿'😴🛏️🛌💤 */}
+                {/* EMOJIS 💖✨🌸🌷🍓🦄🐰🐱🐣🍑🍒🍦🧁🍉💞💌🌈🎀👑💅💗💘🐶🍼
+                🍬🍭🫧💟🩷🩰🧸🥰🥺🚰💧💦🌊🥤🔫🚿'😴🛏️🛌💤 */}
                 <div className="text-center space-y-3">
                     <h2 className="text-3xl font-bold text-pink-500 tracking-wide animate-pulse">
                         Einen Moment bitte 🥹

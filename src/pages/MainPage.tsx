@@ -2,7 +2,6 @@ import {DayForm} from '../components/DayForm';
 import type {Day} from '../types/day';
 import {trySaveDayLocalAndSyncLaterOn, trySaveEntriesLocalAndSyncLaterOn} from "../services/db.ts";
 import type {Habit} from "../types/habit.ts";
-import {DONE_PAGE} from "../App.tsx";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getMotivationalSpeech, sendEmail} from "../services/api.ts";
@@ -11,14 +10,16 @@ import type {Entry} from "../types/entry.ts";
 import {syncWithBackend} from "../services/sync.ts";
 import type {DayKeyFields} from "../types/dayKeyFields.ts";
 import type {EmailResponse} from "../types/emailResponse.ts";
+import {DONE_PAGE} from "../components/RouteRedirector.tsx";
 
 
 interface MainPageProps {
     habits: Habit[],
-    setCurrentDay: (value: (((prevState: (Day | null)) => (Day | null)) | Day | null)) => void
+    setCurrentDay: (value: (((prevState: (Day | null)) => (Day | null)) | Day | null)) => void,
+    access_token: string
 }
 
-export function MainPage({habits, setCurrentDay}: MainPageProps) {
+export function MainPage({habits, setCurrentDay, access_token}: MainPageProps) {
     const navigate = useNavigate();
     const [motivationalSpeech, setMotivationalSpeech] = useState<MotivationalSpeech>({
         day: "",
@@ -30,7 +31,7 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
         (async () => {
             const today = new Date().toISOString().slice(0, 10);
             try {
-                const dbMotivationalSpeech = await getMotivationalSpeech(today)
+                const dbMotivationalSpeech = await getMotivationalSpeech(access_token, today)
                 if (dbMotivationalSpeech !== null) {
                     setMotivationalSpeech(dbMotivationalSpeech)
                     console.log("Motivational Speech loaded from backend")
@@ -63,7 +64,7 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
         await trySaveDayLocalAndSyncLaterOn(dbDay);
         await trySaveEntriesLocalAndSyncLaterOn(dbEntries);
         setCurrentDay(dbDay);
-        const synced = await syncWithBackend();
+        const synced = await syncWithBackend(access_token);
         if (synced) {
             console.log("Synced new day with backend.")
         } else {
@@ -72,7 +73,7 @@ export function MainPage({habits, setCurrentDay}: MainPageProps) {
         }
         console.log(`Day saved for the day "${today}". Navigating to done page.`);
         navigate(DONE_PAGE); // geht zur Done page
-        const sendEmailResponse: EmailResponse = await sendEmail(dbDay, dbEntries);
+        const sendEmailResponse: EmailResponse = await sendEmail(access_token, dbDay, dbEntries);
         if (sendEmailResponse.success) {
             console.log("Successfully sent confirmation email");
         } else {

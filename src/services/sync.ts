@@ -9,7 +9,7 @@ import type {SyncItem} from "../types/syncpayload.ts";
  * - schickt sie ans Backend
  * - entfernt erfolgreich gesendete Items
  */
-export async function syncWithBackend() {
+export async function syncWithBackend(token: string) {
     const syncData: SyncItem[] = await getSyncQueue()
     let performed = false;
 
@@ -19,7 +19,7 @@ export async function syncWithBackend() {
         try {
             const res = await fetch(item.endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(item.payload),
             });
 

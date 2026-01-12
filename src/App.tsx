@@ -2,46 +2,74 @@ import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { syncWithBackend } from './services/sync';
 import { useEffect, useState } from "react";
 import {getLocalDays} from "./services/db.ts";
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import {getCurrentDay, getHabits} from "./services/api.ts";
+import { useLocation } from 'react-router-dom';
+import {getCurrentDay, getHabits, pingBackend} from "./services/api.ts";
 import type {Habit} from "./types/habit.ts";
-import {MainPage} from "./pages/MainPage.tsx";
-import {WelcomePage} from "./pages/WelcomePage.tsx";
-import {DonePage} from "./pages/DonePage.tsx";
 import type {Day} from "./types/day.ts";
 import {LoadingPage} from "./pages/LoadingPage.tsx";
 import type {LoginResponse} from "./types/loginResponse.ts";
 import {LoginPage} from "./pages/LoginPage.tsx";
-
-export const MAIN_PAGE: string = "/"
-export const WELCOME_PAGE: string = "/welcome"
-export const DONE_PAGE: string = "/done"
-export const LOGIN_PAGE: string = "/login"
-export const LOADING_PAGE: string = "/loading"
+import {RouteRedirector} from "./components/RouteRedirector.tsx";
 
 type LoadingState = {
+    isBackendAwake: boolean;
     isHabits: boolean;
     isDaySubmitted: boolean;
 };
 
 export default function AppRoutes() {
-    const [isLoaded, setIsLoaded] = useState<LoadingState>({isHabits: false, isDaySubmitted: false});
+    const [isLoaded, setIsLoaded] = useState<LoadingState>({isBackendAwake: false,
+        isHabits: false, isDaySubmitted: false});
     const [habits, setHabits] = useState<Habit[]>([]);
-    const [loginTokenData, setLoginTokenData] = useState<LoginResponse>({
-        exp: "",
-        message: "",
-        success: false,
-        token: ""
-    })
+    const [loginTokenData, setLoginTokenData] = useState<LoginResponse>(() => {
+        const savedToken = localStorage.getItem("access_token");
+        const exp = localStorage.getItem("exp");
+        if (savedToken && exp) {
+            console.log("Got access token from local storage. It might be invalid.")
+            return {token: savedToken, success: true, exp: exp};
+        } else {
+            return {token: "", success: false, exp: ""}
+        }
+    });
     const [currentDay, setCurrentDay] = useState<Day | null>(null);
     const online = useOnlineStatus();
     const location = useLocation();
 
-    // init: check if there are already habits in the backend or indexdb
+    // init: check if backend is awake
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await pingBackend();
+                if (res?.message.includes("running")) {
+                    console.log("Got ping from Backend! Backend is running.");
+                    setIsLoaded(prev => ({
+                        ...prev,
+                        isBackendAwake: true,
+                    }));
+                } else {
+                    console.log("Did not get ping from Backend! Backend is not running.");
+                }
+            } catch (error) {
+                console.log("Error while pinging the backend. Error:")
+                console.error(error);
+                setIsLoaded(prev => ({
+                    ...prev,
+                    isBackendAwake: false,
+                }));
+            }
+        })();
+
+    }, []);
+
+    useEffect(() => {
+        console.log(isLoaded);
+    }, [isLoaded]);
+
+    // init: check if there are already habits in the backend
     useEffect(() => {
         const tryLoadHabitsFromBackend = async () => {
             try {
-                const habits = await getHabits();
+                const habits = await getHabits(loginTokenData.token);
                 setHabits(habits);
                 console.log(`Loaded ${habits.length} habits from backend db.`);
             } catch (err) {
@@ -72,13 +100,22 @@ export default function AppRoutes() {
             if (import.meta.env.DEV) {
                 generateSynthHabitsForDev();
             } else if (import.meta.env.PROD) {
-                await tryLoadHabitsFromBackend();
+                if (!isJWTValid()) {
+                    console.log("No habits are going to get fetched because user is not logged in.")
+                    return;
+                } else {
+                    await tryLoadHabitsFromBackend();
+                }
             }
         })();
     }, []);
 
     // init: check if there is already a day entry for today in the backend
     useEffect(() => {
+        if (!isJWTValid()) {
+            console.log("No day is going to get fetched because user is not logged in.")
+            return;
+        }
         (async () => {
             try {
                 const today: string = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -90,7 +127,7 @@ export default function AppRoutes() {
                     console.log(`Loaded a day entry for today: "${day.day}" from local indexedDB.`);
                 } else {
                     console.log("No day found in indexedDB. Looking in backend db now.")
-                    day = await getCurrentDay(today);
+                    day = await getCurrentDay(loginTokenData.token, today);
                     if(day !== null) { // so if there is a day entry (it's not null)
                         setCurrentDay(day)
                         console.log(`Loaded a day entry for today: "${day.day}" from backend db.`);
@@ -112,17 +149,48 @@ export default function AppRoutes() {
 
     // online changed: sync with backend
     useEffect(() => {
-        console.log(`User is now ${online ? 'online' : 'offline'}.`);
-        if (online) {
+        if (online && isJWTValid()) {
             (async () => {
-                const syncWasPerformed = await syncWithBackend();
+                const syncWasPerformed = await syncWithBackend(loginTokenData.token);
                 if (syncWasPerformed) {
                     console.log(`Synced with backend.`);
                     window.location.reload();
                 }
             })();
         }
-    }, [online]);
+    }, [loginTokenData.token, online]);
+
+    // timer to log out when token is expired
+    useEffect(() => {
+        if (!loginTokenData.token || !loginTokenData.exp) return;
+
+        const expiryTime = new Date(loginTokenData.exp).getTime();
+        const currentTime = new Date().getTime();
+        const delay = expiryTime - currentTime;
+
+        if (delay <= 0) {
+            console.log("Token is expired. Logging out.");
+            handleLogout();
+            return;
+        }
+
+        console.log(`Timer for access token started: Token runs out in ${Math.round(delay / 1000)} seconds.`);
+
+        const timer = setTimeout(() => {
+            console.log("Token is expired. Logging out.");
+            handleLogout();
+        }, delay);
+
+        return () => clearTimeout(timer);
+
+    }, [loginTokenData.token, loginTokenData.exp]);
+
+    const handleLogout = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("exp");
+        setLoginTokenData({ token: "", success: false, exp: "" });
+        console.log("Logged out.");
+    };
 
     // pathname changed: log
     useEffect(() => {
@@ -137,73 +205,17 @@ export default function AppRoutes() {
         return isValid && !isExpired;
     }
 
-    if (!Object.values(isLoaded).some(Boolean)) {
-        return (
-            <LoadingPage />
-        );
-    }
-
     return (
-        <Routes>
-            {/* Hauptseite */}
-            <Route
-                path={MAIN_PAGE}
-                element={
-                    !isJWTValid()
-                        ? (<Navigate to={LOGIN_PAGE} replace />)
-                        : currentDay !== null
-                            ? (<Navigate to={DONE_PAGE} replace />)
-                            : habits.length === 0
-                                ? (<Navigate to={WELCOME_PAGE} replace />)
-                                : (<MainPage habits={habits} setCurrentDay={setCurrentDay} />)
-                }
-            />
+        <>
+            {
+                Object.values(isLoaded).every(Boolean)
+                ? <RouteRedirector habits={habits} currentDay={currentDay} setHabits={setHabits}
+                                   access_token={loginTokenData.token} setCurrentDay={setCurrentDay} />
+                : (<LoadingPage />)
+            }
+            {!isJWTValid() && <LoginPage setLoginTokenData={setLoginTokenData} />}
 
-            {/* Willkommensseite */}
-            <Route
-                path={WELCOME_PAGE}
-                element={
-                    !isJWTValid()
-                        ? (<Navigate to={LOGIN_PAGE} replace />)
-                        : currentDay !== null
-                            ? (<Navigate to={DONE_PAGE} replace />)
-                            : habits.length === 0
-                                ? <WelcomePage setHabits={setHabits} />
-                                : (<Navigate to={MAIN_PAGE} replace />)
 
-                }
-            />
-
-            {/* Done-For-Today Seite */}
-            <Route
-                path={DONE_PAGE}
-                element={
-                    !isJWTValid()
-                        ? (<Navigate to={LOGIN_PAGE} replace />)
-                        : currentDay !== null
-                            ? (<DonePage />)
-                            : habits.length === 0
-                                ? (<Navigate to={WELCOME_PAGE} replace />)
-                                : (<Navigate to={MAIN_PAGE} replace />)
-                }
-            />
-
-            {/* Login Seite */}
-            <Route
-                path={LOGIN_PAGE}
-                element={
-                    !isJWTValid()
-                        ? (<LoginPage />)
-                        : currentDay !== null
-                            ? (<Navigate to={DONE_PAGE} replace />)
-                            : habits.length === 0
-                                ? (<Navigate to={WELCOME_PAGE} replace />)
-                                : (<Navigate to={MAIN_PAGE} replace />)
-                }
-            />
-
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to={WELCOME_PAGE} replace />} />
-        </Routes>
+        </>
     );
 }
