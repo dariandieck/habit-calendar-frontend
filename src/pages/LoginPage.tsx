@@ -1,23 +1,21 @@
 import {useRef, useState} from 'react';
 import type {LoginData} from "../types/loginData.ts";
-import {login} from "../services/api.ts";
-import type {LoginResponse} from "../types/loginResponse.ts";
+import {login} from "../services/api.service.ts";
+import type {TokenData} from "../types/tokenData.ts";
 import * as React from "react";
+import {useAuthContext} from "../context/AuthContext.tsx";
 
 type ErrorState = {
     username: boolean;
     password: boolean;
 };
 
-interface LoginPageProps {
-    setLoginTokenData: (value: (((prevState: LoginResponse) => LoginResponse) | LoginResponse)) => void
-}
-
-export function LoginPage({setLoginTokenData}: LoginPageProps) {
+export function LoginPage() {
     const [loginData, setLoginData] = useState<LoginData>({password: "", username: ""});
     const [isSaving, setIsSaving] = useState(false);
     const [errors, setErrors] = useState<ErrorState>({username: false, password: false});
     const passwordInputRef = useRef<HTMLInputElement>(null);
+    const { setTokenData } = useAuthContext();
 
     const handleUsernameKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -26,7 +24,7 @@ export function LoginPage({setLoginTokenData}: LoginPageProps) {
         }
     };
 
-    function detectErrorsInInputFields() {
+    const detectErrorsInInputFields = () => {
         let anyErrors = false;
         const newErrors: ErrorState = {
             username: loginData.username.trim() === "",
@@ -38,7 +36,7 @@ export function LoginPage({setLoginTokenData}: LoginPageProps) {
         return anyErrors;
     }
 
-    function updateLoginData(field: "username" | "password", value: string) {
+    const updateLoginData = (field: "username" | "password", value: string)=> {
         setLoginData(prev => ({...prev, [field]: value}));
         // Fehler-State updaten
         setErrors(prev => ({...prev, [field]: value.trim() === ""}));
@@ -54,17 +52,19 @@ export function LoginPage({setLoginTokenData}: LoginPageProps) {
         setIsSaving(true);
         setTimeout(async () => {
             try {
-                const loginResponse: LoginResponse = await login(loginData)
-                setLoginTokenData(loginResponse);
-                localStorage.setItem("access_token", loginResponse.token);
-                localStorage.setItem("exp", loginResponse.exp);
-                console.log("User logged in!");
-                if (!loginResponse.success) {
-                    alert(`Error: ${loginResponse.message}`);
+                const loginResponse: TokenData = await login(loginData)
+                if (loginResponse.success) {
+                    localStorage.setItem("access_token", loginResponse.access_token);
+                    localStorage.setItem("exp", loginResponse.expire);
+                    console.log("User logged in!");
+                    setTokenData(loginResponse);
+                } else {
                     console.log(`Could not login. Reason: ${loginResponse.message}`);
+                    alert(`Konnte nicht anmelden: ${loginResponse.message}`);
                 }
             } catch (error) {
                 console.log(`Exception while logging in. Error: ${error}`);
+                alert(`Konnte nicht anmelden: ${error}`);
             } finally {
                 setIsSaving(false);
             }

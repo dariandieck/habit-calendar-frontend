@@ -1,25 +1,22 @@
 import {DayForm} from '../components/DayForm';
 import type {Day} from '../types/day';
-import {trySaveDayLocalAndSyncLaterOn, trySaveEntriesLocalAndSyncLaterOn} from "../services/db.ts";
-import type {Habit} from "../types/habit.ts";
+import {trySaveDayLocalAndSyncLaterOn, trySaveEntriesLocalAndSyncLaterOn} from "../services/db.service.ts";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {getMotivationalSpeech, sendEmail} from "../services/api.ts";
+import {getMotivationalSpeech, sendEmail} from "../services/api.service.ts";
 import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
 import type {Entry} from "../types/entry.ts";
-import {syncWithBackend} from "../services/sync.ts";
+import {syncWithBackend} from "../services/sync.service.ts";
 import type {DayKeyFields} from "../types/dayKeyFields.ts";
 import type {EmailResponse} from "../types/emailResponse.ts";
-import {DONE_PAGE} from "../components/RouteRedirector.tsx";
+import {DONE_PAGE} from "../routes/RouteRedirector.tsx";
+import {getToday} from "../utils/utils.ts";
+import {useAuthContext} from "../context/AuthContext.tsx";
+import {useAppDataContext} from "../context/AppDataContext.tsx";
 
-
-interface MainPageProps {
-    habits: Habit[],
-    setCurrentDay: (value: (((prevState: (Day | null)) => (Day | null)) | Day | null)) => void,
-    access_token: string
-}
-
-export function MainPage({habits, setCurrentDay, access_token}: MainPageProps) {
+export function MainPage() {
+    const { tokenData } = useAuthContext();
+    const { habits, setTodayDay } = useAppDataContext();
     const navigate = useNavigate();
     const [motivationalSpeech, setMotivationalSpeech] = useState<MotivationalSpeech>({
         day: "",
@@ -29,9 +26,9 @@ export function MainPage({habits, setCurrentDay, access_token}: MainPageProps) {
     // load LLM motivational speech from backend
     useEffect(() => {
         (async () => {
-            const today = new Date().toISOString().slice(0, 10);
             try {
-                const dbMotivationalSpeech = await getMotivationalSpeech(access_token, today)
+                const dbMotivationalSpeech = await getMotivationalSpeech(
+                    tokenData.access_token, getToday());
                 if (dbMotivationalSpeech !== null) {
                     setMotivationalSpeech(dbMotivationalSpeech)
                     console.log("Motivational Speech loaded from backend")
@@ -47,7 +44,7 @@ export function MainPage({habits, setCurrentDay, access_token}: MainPageProps) {
 
     const handleSubmit = async (entries: Entry[], formDay: DayKeyFields) => {
         const created_at = new Date().toISOString()
-        const today = created_at.slice(0, 10); // YYYY-MM-DD
+        const today = getToday();
 
         const dbEntries: Entry[] = entries.map(entry => ({
             ...entry,
@@ -63,17 +60,17 @@ export function MainPage({habits, setCurrentDay, access_token}: MainPageProps) {
         // save in indexedDB and then sync to backend
         await trySaveDayLocalAndSyncLaterOn(dbDay);
         await trySaveEntriesLocalAndSyncLaterOn(dbEntries);
-        setCurrentDay(dbDay);
-        const synced = await syncWithBackend(access_token);
+        setTodayDay(dbDay);
+        console.log(`Day saved for the day "${today}". Navigating to done page.`);
+        const synced = await syncWithBackend(tokenData.access_token);
         if (synced) {
             console.log("Synced new day with backend.")
         } else {
             console.log("Could not sync new day with backend. But the items are in the " +
                 "queue and should get synced later on!")
         }
-        console.log(`Day saved for the day "${today}". Navigating to done page.`);
         navigate(DONE_PAGE); // geht zur Done page
-        const sendEmailResponse: EmailResponse = await sendEmail(access_token, dbDay, dbEntries);
+        const sendEmailResponse: EmailResponse = await sendEmail(tokenData.access_token, dbDay, dbEntries);
         if (sendEmailResponse.success) {
             console.log("Successfully sent confirmation email");
         } else {

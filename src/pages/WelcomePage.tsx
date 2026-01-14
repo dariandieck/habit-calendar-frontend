@@ -1,23 +1,22 @@
 import {HabitInputForm} from '../components/HabitInputForm.tsx';
-import {addHabits, getHabits} from '../services/api';
+import {addHabits, getHabits} from '../services/api.service.ts';
 import type {Habit} from '../types/habit';
 import {useNavigate} from "react-router-dom";
 import {WelcomeComponent} from "../components/WelcomeComponent.tsx";
-import {MAIN_PAGE} from "../components/RouteRedirector.tsx";
+import {MAIN_PAGE} from "../routes/RouteRedirector.tsx";
+import {useAppDataContext} from "../context/AppDataContext.tsx";
+import {useAuthContext} from "../context/AuthContext.tsx";
 
-interface WelcomePageProps {
-    setHabits: (value: (((prevState: Habit[]) => Habit[]) | Habit[])) => void,
-    access_token: string
-}
-
-export function WelcomePage({setHabits, access_token}: WelcomePageProps) {
+export function WelcomePage() {
+    const { tokenData } = useAuthContext();
+    const { setHabits } = useAppDataContext();
     const navigate = useNavigate();
 
     async function handleSubmit(habits: Habit[]) {
         if (habits.length === 0) return; // should never be the case because of early filters
         try {
-            await addHabits(access_token, habits); // habits im backend speichern
-            const db_habits_with_id: Habit[] = await getHabits(access_token)
+            await addHabits(tokenData.access_token, habits); // habits im backend speichern
+            const db_habits_with_id: Habit[] = await getHabits(tokenData.access_token)
             setHabits(db_habits_with_id)
             console.log(`Saved ${habits.length} habits in the backend. Going to main page.`);
             navigate(MAIN_PAGE); // geht zur Hauptseite

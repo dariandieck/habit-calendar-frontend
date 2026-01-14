@@ -1,14 +1,7 @@
-import {clearAllData, getSyncQueue} from './db';
-import { removeFromSyncQueue } from './db';
+import {clearAllData, getSyncQueue} from './db.service.ts';
+import { removeFromSyncQueue } from './db.service.ts';
 import type {SyncItem} from "../types/syncpayload.ts";
 
-
-/**
- * Läuft idealerweise beim Online-Event:
- * - holt alle Queue-Items
- * - schickt sie ans Backend
- * - entfernt erfolgreich gesendete Items
- */
 export async function syncWithBackend(token: string) {
     const syncData: SyncItem[] = await getSyncQueue()
     let performed = false;

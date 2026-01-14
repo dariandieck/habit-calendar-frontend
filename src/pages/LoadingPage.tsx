@@ -37,8 +37,9 @@ export function LoadingPage() {
                     <p className="text-gray-400 text-">
                         🧸 Deine App wird gerade vorbereitet 🌸
                     </p>
-                    <p className="text-gray-400 italic text-sm">
-                        Manchmal braucht die Datenbank etwas länger :)
+                    <p className="text-gray-400 italic text-xs">
+                        Manchmal braucht die Datenbank etwas länger :) <br />
+                        Es kann helfen die Seite neu zu laden!
                     </p>
                 </div>
 

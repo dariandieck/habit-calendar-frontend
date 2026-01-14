@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type {Entry} from "../types/entry.ts";
 import type {Day} from "../types/day.ts";
 import type { SyncPayload, SyncItem} from "../types/syncpayload.ts";
-import {BASE_URL} from "./api.ts";
+import {BASE_URL} from "./api.service.ts";
 
 const DB_NAME = 'daily-calendar';
 const DB_VERSION = 4;

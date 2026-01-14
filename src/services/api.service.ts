@@ -4,8 +4,7 @@ import type {MotivationalSpeech} from "../types/motivationalSpeech.ts";
 import type {EmailResponse} from "../types/emailResponse.ts";
 import type {Entry} from "../types/entry.ts";
 import type {LoginData} from "../types/loginData.ts";
-import type {LoginResponse} from "../types/loginResponse.ts";
-import type {PingResponse} from "../types/pingResponse.ts";
+import type {TokenData} from "../types/tokenData.ts";
 
 export const BASE_URL = () => {
     if (import.meta.env.DEV) {
@@ -15,7 +14,7 @@ export const BASE_URL = () => {
     }
 };
 
-export async function login(loginData: LoginData): Promise<LoginResponse> {
+export async function login(loginData: LoginData): Promise<TokenData> {
     const formData = new URLSearchParams();
     formData.append('username', loginData.username);
     formData.append('password', loginData.password);
@@ -45,7 +44,7 @@ export async function addHabits(token: string, habits: Habit[]): Promise<void> {
     }
 }
 
-export async function pingBackend(): Promise<PingResponse> {
+export async function pingBackend(): Promise<{ message: string } | null> {
     const res = await fetch(`${BASE_URL()}`, {
         method: 'GET',
         headers: {
@@ -91,8 +90,8 @@ export async function getMotivationalSpeech(token: string, date: string): Promis
     return await res.json();
 }
 
-export async function getCurrentDay(token: string, today: string): Promise<Day> {
-    const res = await fetch(`${BASE_URL()}/days/date/${today}`, {
+export async function getDay(token: string, day: string): Promise<Day | null> {
+    const res = await fetch(`${BASE_URL()}/days/date/${day}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -102,6 +101,21 @@ export async function getCurrentDay(token: string, today: string): Promise<Day> 
 
     if (!res.ok) {
         throw new Error(res.status + ': Fehler beim laden des current days');
+    }
+
+    return await res.json();
+}
+
+export async function getIsDay(day: string): Promise<boolean | undefined> {
+    const res = await fetch(`${BASE_URL()}/days/date/${day}/ping`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!res.ok) {
+        throw new Error(res.status + ': Fehler beim laden des days (ping)');
     }
 
     return await res.json();
