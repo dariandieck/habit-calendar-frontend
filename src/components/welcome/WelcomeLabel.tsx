@@ -1,4 +1,4 @@
-export function WelcomeComponent() {
+export function WelcomeLabel() {
     return (
         <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-pink-500 mb-8 drop-shadow-sm">

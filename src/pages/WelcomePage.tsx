@@ -1,8 +1,8 @@
-import {HabitInputForm} from '../components/HabitInputForm.tsx';
+import {HabitsInputForm} from '../components/welcome/HabitsInputForm.tsx';
 import {addHabits, getHabits} from '../services/api.service.ts';
 import type {Habit} from '../types/habit';
 import {useNavigate} from "react-router-dom";
-import {WelcomeComponent} from "../components/WelcomeComponent.tsx";
+import {WelcomeLabel} from "../components/welcome/WelcomeLabel.tsx";
 import {MAIN_PAGE} from "../routes/RouteRedirector.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {useAuthContext} from "../context/AuthContext.tsx";
@@ -13,11 +13,11 @@ export function WelcomePage() {
     const navigate = useNavigate();
 
     async function handleSubmit(habits: Habit[]) {
-        if (habits.length === 0) return; // should never be the case because of early filters
         try {
             await addHabits(tokenData.access_token, habits); // habits im backend speichern
             const db_habits_with_id: Habit[] = await getHabits(tokenData.access_token)
             setHabits(db_habits_with_id)
+            localStorage.setItem("habits", JSON.stringify(db_habits_with_id));
             console.log(`Saved ${habits.length} habits in the backend. Going to main page.`);
             navigate(MAIN_PAGE); // geht zur Hauptseite
         } catch (error) {
@@ -26,8 +26,6 @@ export function WelcomePage() {
             alert('Es gab einen kleinen Fehler (upsie! 💅). Frag Dari was los ist 🥺');
         }
     }
-
-    //EMOJIS 💖✨🌸🌷🍓🦄🐰🐱🐣🍑🍒🍦🧁🍉💞💌🌈🎀👑💅💗💘💞🐶🍼🍬🍭🫧💟🩷🩰🧸🥰🥺🚰💧💦🌊🥤🔫🚿'😴🛏️🛌💤
     return (
         <div className="flex justify-center items-start sm:items-center min-h-[80vh] p-4">
             <div className="
@@ -41,8 +39,8 @@ export function WelcomePage() {
                 shadow-xl
                 border border-pink-100"
             >
-                <WelcomeComponent/>
-                <HabitInputForm onSubmit={handleSubmit}/>
+                <WelcomeLabel/>
+                <HabitsInputForm onSubmit={handleSubmit}/>
             </div>
         </div>
     );

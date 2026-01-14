@@ -1,4 +1,4 @@
-import {getDay, getHabits, getIsDay, pingBackend} from "./api.service.ts";
+import {getDay, getHabits, getIsDay, getMotivationalSpeech, pingBackend} from "./api.service.ts";
 import {getToday} from "../utils/utils.ts";
 import type {Habit} from "../types/habit.ts";
 import type {Day} from "../types/day.ts";
@@ -18,29 +18,21 @@ export const tryFetchIsTodayDayFromBackend = async () => {
     const res: boolean | undefined = await getIsDay(getToday())
     return !!res;
 }
-const tryFetchHabitsFromBackend = async (access_token: string) => {
+export const tryFetchLocalHabits = (): Habit[] => {
+    const habitsString: string | null = localStorage.getItem("habits");
+    if (habitsString) {
+        return JSON.parse(habitsString);
+    } else {
+        return [];
+    }
+};
+export const tryFetchHabitsFromBackend= async (access_token: string) => {
     try {
         return await getHabits(access_token);
     } catch (err) {
         console.log('Error while requesting habits from backend. Error:');
         console.error(err);
         return [];
-    }
-};
-const genSynthHabitsForDev = () => {
-    const synthHabits: Habit[] = [
-        {description: "Test habit1", h_id: 0, name: "habit1"},
-        {description: "Test habit2", h_id: 1, name: "Sport"},
-        {description: "Test habit3", h_id: 2, name: "Wasser trinken"}
-    ];
-    console.log(`DEV: Generated ${synthHabits.length} synth-habits.`);
-    return synthHabits;
-}
-export const tryFetchHabits= async (access_token: string) => {
-    if (import.meta.env.DEV) {
-        return genSynthHabitsForDev();
-    } else {
-        return await tryFetchHabitsFromBackend(access_token);
     }
 };
 export const tryFetchDayFromBackend = async (access_token: string) => {
@@ -68,13 +60,13 @@ export const tryFetchDayFromIndexedDB = async () => {
     }
 }
 
-export const tryFetchLocalTokenData = () => {
-    const localToken = localStorage.getItem("access_token");
-    const localExp = localStorage.getItem("exp");
-    if (localToken && localExp) {
-        console.log("Got access token from local storage. It might be invalid.")
-        return {token: localToken, success: true, exp: localExp};
-    } else {
-        return {token: "", success: false, exp: ""}
+export const tryFetchMotivationalSpeechFromBackend
+    = async (access_token: string) => {
+    try {
+        return await getMotivationalSpeech(access_token, getToday())
+    } catch (e) {
+        console.log("Error while trying to get motivational speech. Error:");
+        console.error(e);
+        return null;
     }
 }

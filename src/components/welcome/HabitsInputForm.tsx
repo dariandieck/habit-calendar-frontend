@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import type {Habit} from '../types/habit';
+import type {Habit} from '../../types/habit.ts';
+import {RainbowButton} from "../ui/RainbowButton.tsx";
 
 type Props = {
     onSubmit: (habits: Habit[]) => void;
@@ -12,18 +13,19 @@ type ErrorState = {
     }
 };
 
-export function HabitInputForm({ onSubmit }: Props) {
+export function HabitsInputForm({ onSubmit }: Props) {
     const [habits, setHabits] = useState<Habit[]>([{ name: "", description: "" }]);
     const [errors, setErrors] = useState<ErrorState>({});
     const [isSaving, setIsSaving] = useState(false);
 
     // fügt einen neuen leeren Habit hinzu
-    function addEmptyHabit() {
+    const addEmptyHabit = () => {
         setHabits([...habits, { name: "", description: "" }]);
     }
 
     // aktualisiert entweder name oder description
-    function updateHabit(index: number, field: "name" | "description", value: string) {
+    const updateHabit = (
+            index: number, field: "name" | "description", value: string) => {
         const oldHabits = [...habits];
         oldHabits[index] = { ...oldHabits[index], [field]: value };
         setHabits(oldHabits);
@@ -38,14 +40,14 @@ export function HabitInputForm({ onSubmit }: Props) {
         setErrors(oldErrors); // neuen State setzen
     }
 
-    function clearHabit(index: number) {
+    const clearHabit = (index: number) => {
         const copy = [...habits];
         copy[index] = { name: "", description: "" };
         setHabits(copy);
     }
 
     // den Habit am Index löschen
-    function removeHabit(index: number) {
+    const removeHabit = (index: number) => {
         if (habits.length === 1) { // mindestens 1 Habit bleibt
             clearHabit(index);
             return
@@ -56,7 +58,7 @@ export function HabitInputForm({ onSubmit }: Props) {
         setHabits(copy);
     }
 
-    function detectErrorsInInputFields() {
+    const detectErrorsInInputFields = () => {
         const newErrors: ErrorState = {};
         let anyErrors = false;
 
@@ -74,7 +76,7 @@ export function HabitInputForm({ onSubmit }: Props) {
     }
 
     // filtert leere Habits und ruft onSubmit auf
-    function submitHabits() {
+    const submitHabits = () => {
         const anyErrors = detectErrorsInInputFields();
         if (anyErrors) {
             alert("Bitte alle Felder ausfüllen :)");
@@ -162,43 +164,9 @@ export function HabitInputForm({ onSubmit }: Props) {
                 </button>
             </div>
 
-
-            <div className="relative group mt-8 w-full h-[64px] flex items-center justify-center">
-
-                {/* DER REGENBOGEN-KREISEL (Jetzt auch aktiv wenn isSaving wahr ist) */}
-                <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-square 
-      bg-[conic-gradient(from_0deg,#ff0000,#ff8000,#ffff00,#00ff00,#00ffff,#0000ff,#8000ff,#ff00ff,#ff0000)] 
-      ${isSaving ? 'opacity-100 animate-[rainbow-spin_1s_linear_infinite] blur-md' : 'opacity-0 group-hover:opacity-100 group-hover:animate-rainbow-spin'} 
-      transition-all duration-500`}>
-                    </div>
-                </div>
-
-                {/* DER BUTTON */}
-                <button
-                    type="button"
-                    disabled={isSaving}
-                    onClick={submitHabits}
-                    className={`relative z-20 w-[calc(100%-8px)] h-[calc(100%-8px)] 
-                        ${isSaving ? 'bg-white text-pink-500' : 'bg-linear-to-r from-pink-400 to-purple-500 text-white'}
-                            font-bold rounded-[14px] shadow-lg transition-all duration-500
-                            flex items-center justify-center gap-3 overflow-hidden`}
-                >
-                    {isSaving ? (
-                        <>
-                            <span className="animate-bounce">💖</span>
-                            <span className="tracking-widest uppercase text-sm">Wird gespeichert...</span>
-                            <span className="animate-bounce">💖</span>
-                        </>
-                    ) : (
-                        <>
-                            <span className="group-hover:animate-bounce">✨</span>
-                            <span>Speichern</span>
-                            <span className="group-hover:animate-bounce">✨</span>
-                        </>
-                    )}
-                </button>
-            </div>
+            <RainbowButton isSubmit={false} onClick={submitHabits} isSaving={isSaving} text={"Speichern"}
+                           actionEmoji={"💖"} actionText={"Wird gespeichert..."}
+            />
         </div>
     );
 }

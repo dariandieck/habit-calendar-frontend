@@ -74,7 +74,7 @@ export async function getHabits(token: string): Promise<Habit[]> {
     return await res.json();
 }
 
-export async function getMotivationalSpeech(token: string, date: string): Promise<MotivationalSpeech> {
+export async function getMotivationalSpeech(token: string, date: string): Promise<MotivationalSpeech | null> {
     const res = await fetch(`${BASE_URL()}/motivationalspeeches/${date}`, {
         method: 'GET',
         headers: {

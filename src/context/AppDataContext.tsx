@@ -3,9 +3,9 @@ import type { Habit } from "../types/habit";
 import type { Day } from "../types/day";
 import * as React from "react";
 import {
-    tryFetchDayFromIndexedDB, tryFetchHabits,
+    tryFetchDayFromIndexedDB, tryFetchHabitsFromBackend,
     tryFetchIsBackendAwake,
-    tryFetchIsTodayDayFromBackend
+    tryFetchIsTodayDayFromBackend, tryFetchLocalHabits
 } from "../services/fetch.service.ts";
 import {useAuthContext} from "./AuthContext.tsx";
 
@@ -42,12 +42,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         // isBackendAwake
         const isBackendAwake = await tryFetchIsBackendAwake();
         setIsBackendAwake(isBackendAwake);
-        if (!isBackendAwake) {
-            // backend is not responding. No need to call anything else.
-            console.log("Backend is not awake (ping no result). No need to load anything else");
-            return;
-        }
-        console.log("Got ping from the backend. Backend is awake.")
+        console.log(`${isBackendAwake 
+            ? "Got ping from the backend. Backend is awake." 
+            : "Backend is not awake (ping no result)."}
+        `);
 
         // first, try to get the day locally
         const todayDayIndexedDB = await tryFetchDayFromIndexedDB();
@@ -61,23 +59,34 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         }
         console.log("No day entry for today found in indexed db. Looking in the backend next.");
 
-        const isTodayDayFromBackend = await tryFetchIsTodayDayFromBackend();
-        if (isTodayDayFromBackend) {
-            // before the user is even logged in we get to know if there is a day for today. Then same logic applies
-            console.log("Confirmed that there is a day for today from the backend.")
-            setIsTodayDay(true);
+        if (isBackendAwake) {
+            const isTodayDayFromBackend = await tryFetchIsTodayDayFromBackend();
+            if (isTodayDayFromBackend) {
+                // before the user is even logged in we get to know if there is a day for today. Then same logic applies
+                console.log("Confirmed that there is a day for today from the backend.")
+                setIsTodayDay(true);
+                setIsDataLoaded(true);
+                return;
+            }
+            console.log("Confirmed that there no day for today from the backend. Looking for the habits next.")
+        }
+
+
+        // anything below here is when we don't have a day
+        const habits: Habit[] = tryFetchLocalHabits();
+        if (habits.length > 0) {
+            console.log(`Found ${habits.length} habits in localstorage.`);
+            setHabits(habits);
             setIsDataLoaded(true);
             return;
         }
-        console.log("Confirmed that there no day for today from the backend. Looking for the habits next.")
-
-        // anything below here is when we don't have a day but the backend is awake
+        console.log("No Habits found locally. Looking in the backend next.");
 
         if (!isUserLoggedIn) {
             console.log("Can not get habits from backend. User does not have a valid session. " +
-                "He needs to log in before fetching the Habits"); 
-        } else {
-            const habits: Habit[] = await tryFetchHabits(tokenData.access_token);
+                "He needs to log in before fetching the Habits.");
+        } else if (isBackendAwake) {
+            const habits: Habit[] = await tryFetchHabitsFromBackend(tokenData.access_token);
             setHabits(habits);
             if (habits.length === 0) {
                 console.log("No habits were (found/)fetched.")

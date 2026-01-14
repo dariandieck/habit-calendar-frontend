@@ -22,9 +22,9 @@ export function RouteRedirector({ isTodayDay }: RouteRedirectorProps) {
                 element={
                     isTodayDay
                         ? <Navigate to={DONE_PAGE} replace />
-                        : habits.length === 0
-                            ? <Navigate to={WELCOME_PAGE} replace />
-                            : <MainPage />
+                        : habits.length > 0
+                            ? <MainPage />
+                            : <Navigate to={WELCOME_PAGE} replace />
                 }
             />
 

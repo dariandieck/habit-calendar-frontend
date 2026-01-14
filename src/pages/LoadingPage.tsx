@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {LoadingBar} from "../components/loading/LoadingBar.tsx";
 
 export function LoadingPage() {
     const emojis = ["✨", "🌸", "🦄", "🧸", "🍦", "💫", "💞", "🎀", "👑","💖", "💅", "💗", "🍭", "💟"];
@@ -43,10 +44,7 @@ export function LoadingPage() {
                     </p>
                 </div>
 
-                <div className="mt-8 w-48 h-1.5 bg-pink-100 rounded-full overflow-hidden m-auto">
-                    <div className="h-full bg-linear-to-r from-pink-300 to-purple-300 w-1/2
-                        rounded-full animate-[shimmer_2s_infinite] origin-left"></div>
-                </div>
+                <LoadingBar />
 
                 <span className="text-[10px] uppercase tracking-[0.2em] text-pink-300 mt-3 font-medium">
                         Loading...
