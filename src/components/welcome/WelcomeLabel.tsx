@@ -27,7 +27,7 @@ export function WelcomeLabel() {
                 </div>
 
                 <p className="text-sm text-gray-400 mt-4 px-8">
-                    Schreibe genau auf, was die schlechte Gewohnheit ist und vergebe einen Kurznamen (max. 3 Worte).
+                    Schreibe genau auf, was die schlechte Gewohnheit ist und vergebe einen Kurznamen (max. 5 Wörter).
                 </p>
             </div>
         </div>

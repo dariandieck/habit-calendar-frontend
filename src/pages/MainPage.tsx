@@ -14,16 +14,11 @@ import {MainForm} from "../components/main/MainForm.tsx";
 
 export function MainPage() {
     const { tokenData } = useAuthContext();
-    const { setTodayDay, isBackendAwake } = useAppDataContext();
+    const { setTodayDay } = useAppDataContext();
     const navigate = useNavigate();
 
     const handleSubmit = async (
             entries: Entry[], formDay: DayKeyFields, motivationalSpeech: string) => {
-        if (!isBackendAwake) {
-            console.log("Handle login was interrupted because we know the backend is now awake.");
-            alert("Die Datenbank ist nicht erreichbar. Frag Dari was los ist 🥺");
-            return;
-        }
 
         const created_at = new Date().toISOString()
         const today = getToday();

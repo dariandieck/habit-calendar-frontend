@@ -44,3 +44,43 @@
     z-index: 9999; /* Ganz nach oben */
     backdrop-filter: blur(5px); /* Macht den Hintergrund unscharf */
 }
+
+@theme {
+    @keyframes glow-zoom-happy {
+        0%, 100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 5px rgba(0, 201, 80, 0.78));
+        }
+        50% {
+            transform: scale(1.05); /* Sanfter Zoom */
+            filter: drop-shadow(0 0 15px rgba(0, 201, 80, 0.77)); /* Stärkerer Glow */
+        }
+    }
+}
+
+.animate-glow-zoom-happy {
+    animation: glow-zoom-happy 2s ease-in-out infinite;
+}
+
+@theme {
+    @keyframes glow-zoom-sad {
+        0%, 100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 5px rgba(59, 7, 86, 0.78));
+        }
+        50% {
+            transform: scale(1.05); /* Sanfter Zoom */
+            filter: drop-shadow(0 0 15px rgba(59, 7, 86, 0.78)); /* Stärkerer Glow */
+        }
+    }
+}
+
+.animate-glow-zoom-sad {
+    animation: glow-zoom-sad 2s ease-in-out infinite;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

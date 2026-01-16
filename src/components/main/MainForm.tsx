@@ -32,14 +32,11 @@ export function MainForm({handleSubmit}: MainFormProps) {
         how_are_you_field: "", stress_field: "", good_field: "", why_good_field: "", bad_field: "", improve_field: ""
     });
 
-
     // load LLM motivational speech from backend
     useEffect(() => {
         (async () => {
-            if (!isUserLoggedIn) {
-                console.log("User is not logged in. Can not load motivational Speech from backend.")
-                return;
-            }
+            if (!isUserLoggedIn) return;
+
             const motivationalSpeech = await tryFetchMotivationalSpeechFromBackend(
                 tokenData.access_token);
             if (motivationalSpeech) {
@@ -80,7 +77,7 @@ export function MainForm({handleSubmit}: MainFormProps) {
 
 
             <RainbowButton isSubmit={false} isSaving={isSaving} onClick={onSubmit}
-                           text={"Speichern ✨"} actionEmoji={"💖"} actionText={"Wird gespeichert..."}
+                           text={"Speichern ✨"} actionEmoji={"✨"} actionText={"Wird gespeichert..."}
             />
         </div>
     )

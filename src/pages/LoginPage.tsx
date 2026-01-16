@@ -3,18 +3,11 @@ import {login} from "../services/api.service.ts";
 import {useAuthContext} from "../context/AuthContext.tsx";
 import {LoginInputForm} from "../components/login/LoginInputForm.tsx";
 import type {TokenData} from "../types/tokenData.ts";
-import {useAppDataContext} from "../context/AppDataContext.tsx";
 
 export function LoginPage() {
     const { setTokenData } = useAuthContext();
-    const { isBackendAwake } = useAppDataContext();
 
     const handleLogin = async (loginData: LoginData) => {
-        if (!isBackendAwake) {
-            console.log("Handle login was interrupted because we know the backend is now awake.");
-            alert("Die Datenbank ist nicht erreichbar. Frag Dari was los ist 🥺");
-            return;
-        }
         try {
             const loginResponse: TokenData = await login(loginData)
             if (loginResponse.success) {

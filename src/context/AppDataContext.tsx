@@ -91,6 +91,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             if (habits.length === 0) {
                 console.log("No habits were (found/)fetched.")
             } else {
+                localStorage.setItem("habits", JSON.stringify(habits));
                 console.log(`${habits.length} habits have been (found/)fetched.`);
             }
         }

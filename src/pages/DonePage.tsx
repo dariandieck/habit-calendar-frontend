@@ -1,15 +1,20 @@
 import { useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import {useAuthContext} from "../context/AuthContext.tsx";
 
 export function DonePage() {
+    const { isUserLoggedIn } = useAuthContext();
+
     useEffect(() => {
-        const duration = 3 * 1000; // 3 Sekunden
-        const animationEnd = Date.now() + duration;
+        if (!isUserLoggedIn) return;
+
+        const duration = 4000
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-        const interval: number = setInterval(function() {
+        const animationEnd = Date.now() + duration;
+        const randomInRange =
+            (min: number, max: number) => Math.random() * (max - min) + min;
+        
+        const interval = setInterval(function() {
             const timeLeft = animationEnd - Date.now();
 
             if (timeLeft <= 0) {
@@ -23,8 +28,10 @@ export function DonePage() {
             confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
         }, 250);
 
-        return () => clearInterval(interval);
-    }, []);
+
+        return () => {clearInterval(interval);};
+    }, [isUserLoggedIn]);
+
 
     return (
         <div className="flex justify-center items-center p-4 ">

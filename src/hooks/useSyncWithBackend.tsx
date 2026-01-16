@@ -1,6 +1,6 @@
 import {useEffect} from "react";
 import {syncWithBackend} from "../services/sync.service.ts";
-import {useOnlineStatus} from "./useOnlineStatus.ts";
+import {useOnlineStatus} from "./useOnlineStatus.tsx";
 import {useAuthContext} from "../context/AuthContext.tsx";
 
 export const useSyncWithBackend = () => {

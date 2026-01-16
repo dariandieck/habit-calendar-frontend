@@ -13,9 +13,16 @@ type ErrorState = {
     }
 };
 
+type LengthConflictState = {
+    [id: number]: {
+        lengthConflict: boolean;
+    }
+};
+
 export function HabitsInputForm({ onSubmit }: Props) {
     const [habits, setHabits] = useState<Habit[]>([{ name: "", description: "" }]);
     const [errors, setErrors] = useState<ErrorState>({});
+    const [lengthConflicts, setLengthConflicts] = useState<LengthConflictState>({});
     const [isSaving, setIsSaving] = useState(false);
 
     // fügt einen neuen leeren Habit hinzu
@@ -38,6 +45,13 @@ export function HabitsInputForm({ onSubmit }: Props) {
         // nur das aktuelle Feld updaten
         oldErrors[index][field] = value.trim() === "";
         setErrors(oldErrors); // neuen State setzen
+
+        const oldLengthConflicts = { ...lengthConflicts };
+        if (!oldLengthConflicts[index]) {
+            oldLengthConflicts[index] = { lengthConflict: false }; // falls noch nicht vorhanden
+        }
+        oldLengthConflicts[index]["lengthConflict"] = habits[index].name.split(" ").length > 5;
+        setLengthConflicts(oldLengthConflicts);
     }
 
     const clearHabit = (index: number) => {
@@ -58,7 +72,7 @@ export function HabitsInputForm({ onSubmit }: Props) {
         setHabits(copy);
     }
 
-    const detectErrorsInInputFields = () => {
+    const detectEmptyInputFields = () => {
         const newErrors: ErrorState = {};
         let anyErrors = false;
 
@@ -75,13 +89,36 @@ export function HabitsInputForm({ onSubmit }: Props) {
         return anyErrors;
     }
 
+    const detectLengthConflicts = () => {
+        const newLengthConflicts: LengthConflictState = {};
+        let anyLengthConflicts = false;
+
+        for (let i = 0; i < habits.length; i++) {
+            newLengthConflicts[i] = {
+                lengthConflict: habits[i].name.split(" ").length > 5
+            };
+            if (!anyLengthConflicts && habits[i].name.split(" ").length > 5) {
+                anyLengthConflicts = true;
+            }
+        }
+        setLengthConflicts(newLengthConflicts);
+        return anyLengthConflicts;
+    }
+
     // filtert leere Habits und ruft onSubmit auf
     const submitHabits = () => {
-        const anyErrors = detectErrorsInInputFields();
-        if (anyErrors) {
+        const anyEmptyFields = detectEmptyInputFields();
+        if (anyEmptyFields) {
             alert("Bitte alle Felder ausfüllen :)");
             return;
         }
+
+        const anyLengthConflicts = detectLengthConflicts();
+        if (anyLengthConflicts) {
+            alert("Der Habit-Name darf nur 5 Wörter lang sein :)");
+            return;
+        }
+
         const cleaned: Habit[] = habits
             .filter(h => h.name.trim() !== "" && h.description.trim() !== "");
         if (cleaned.length === 0 || (habits.length === 1 && habits[0].description === "" && habits[0].name === "")) {
@@ -112,7 +149,8 @@ export function HabitsInputForm({ onSubmit }: Props) {
                             placeholder={`Name ${i + 1}. Habit`}
                             className={`w-full sm:flex-[2] p-3 rounded-xl border-2 text-base transition-all 
                                 outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 ${
-                                errors[i]?.name ? "border-red-300 bg-red-50":"border-pink-50 bg-white/50"
+                                errors[i]?.name || lengthConflicts[i]?.lengthConflict 
+                                    ? "border-red-300 bg-red-50":"border-pink-50 bg-white/50"
                             }`}
                         />
                         <input
@@ -164,8 +202,8 @@ export function HabitsInputForm({ onSubmit }: Props) {
                 </button>
             </div>
 
-            <RainbowButton isSubmit={false} onClick={submitHabits} isSaving={isSaving} text={"Speichern"}
-                           actionEmoji={"💖"} actionText={"Wird gespeichert..."}
+            <RainbowButton isSubmit={false} onClick={submitHabits} isSaving={isSaving} text={"Speichern 🌸"}
+                           actionEmoji={"🌸"} actionText={"Wird gespeichert..."}
             />
         </div>
     );

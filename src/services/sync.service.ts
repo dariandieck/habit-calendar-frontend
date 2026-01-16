@@ -6,8 +6,10 @@ export async function syncWithBackend(token: string) {
     const syncData: SyncItem[] = await getSyncQueue()
     let performed = false;
 
-    console.log("Trying to Sync the following data with Backend")
-    console.log(syncData);
+    if(syncData.length > 0) {
+        console.log("Trying to Sync the following data with Backend")
+        console.log(syncData);
+    }
     for (const item of syncData) {
         try {
             const res = await fetch(item.endpoint, {
