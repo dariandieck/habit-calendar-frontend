@@ -8,4 +8,6 @@ export interface SyncItem {
     indexed_db_q_id: number;
     endpoint: string;
     payload: SyncPayload;
+    store_name: string;
+    indexed_db_id: number;
 }

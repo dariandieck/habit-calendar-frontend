@@ -1,12 +1,12 @@
 import { openDB, type IDBPDatabase } from 'idb';
 import type {Entry} from "../types/entry.ts";
 import type {Day} from "../types/day.ts";
-import type { SyncPayload, SyncItem} from "../types/syncpayload.ts";
+import type { SyncPayload, SyncItem} from "../types/syncPayload.ts";
 import {BASE_URL} from "./api.service.ts";
 import type {EmailSend} from "../types/emailSend.ts";
 
 const DB_NAME = 'daily-calendar';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 const DAY_STORE = 'days';
 const ENTRY_STORE = 'entries';
 const EMAIL_STORE = 'emails';
@@ -70,28 +70,28 @@ export async function getLocalEntries(): Promise<Entry[]> {
 export async function trySaveEntriesLocalAndSyncLaterOn(entries: Entry[]): Promise<void> {
     const db = await getDB();
     const tx = db.transaction(ENTRY_STORE, 'readwrite');
-    entries.forEach(entry => tx.store.put(entry));
+    const id = await tx.store.put(entries) as number;
     await tx.done;
 
-    await addToSyncQueue("/entries", entries)
+    await addToSyncQueue("/entries", entries, id, ENTRY_STORE);
 }
 
 export async function trySaveDayLocalAndSyncLaterOn(day: Day): Promise<void> {
     const db = await getDB();
     const tx = db.transaction(DAY_STORE, 'readwrite');
-    tx.store.put(day)
+    const id = await tx.store.put(day) as number;
     await tx.done;
 
-    await addToSyncQueue("/days", day)
+    await addToSyncQueue("/days", day, id, DAY_STORE);
 }
 
 export async function trySaveEmailLocalAndSyncLaterOn(email: EmailSend): Promise<void> {
     const db = await getDB();
     const tx = db.transaction(EMAIL_STORE, 'readwrite');
-    tx.store.put(email)
+    const id = await tx.store.put(email) as number;
     await tx.done;
 
-    await addToSyncQueue("/sendemail", email)
+    await addToSyncQueue("/sendemail", email, id, EMAIL_STORE);
 }
 
 // ---------------------------
@@ -99,12 +99,14 @@ export async function trySaveEmailLocalAndSyncLaterOn(email: EmailSend): Promise
 // ---------------------------
 
 // Payload zur Sync Queue hinzufügen
-export async function addToSyncQueue(endpoint: string, payload: SyncPayload) {
+export async function addToSyncQueue(endpoint: string, payload: SyncPayload, itemID: number, store_name: string) {
     const db = await getDB();
     const tx = db.transaction(SYNC_STORE, 'readwrite');
     await tx.store.add({
         endpoint: BASE_URL() + endpoint,
-        payload: payload
+        payload: payload,
+        store_name: store_name,
+        indexed_db_id: itemID
     });
     await tx.done;
 }
@@ -120,6 +122,13 @@ export async function removeFromSyncQueue(indexed_db_q_id: number) {
     const db = await getDB();
     const tx = db.transaction(SYNC_STORE, 'readwrite');
     await tx.store.delete(indexed_db_q_id);
+    await tx.done;
+}
+
+export async function removeItemFromStoreWithID(store_name: string, indexed_db_id: number) {
+    const db = await getDB();
+    const tx = db.transaction(store_name, 'readwrite');
+    await tx.store.delete(indexed_db_id);
     await tx.done;
 }
 

@@ -45,10 +45,10 @@ export function MainPage() {
         console.log(`Day saved for the day "${today}". Navigating to done page.`);
         const synced = await syncWithBackend(tokenData.access_token);
         if (!synced) {
-            console.log("Could not sync new day with backend. But the items are in the " +
+            console.log("Errors while syncing data with backend. But the items are in the " +
                 "queue and should get synced later on!");
         } else {
-            console.log("Sync with backend completed right away.")
+            console.log("Sync with backend completed right away without any errors.")
         }
         sessionStorage.removeItem("entries");
         sessionStorage.removeItem("formDay");

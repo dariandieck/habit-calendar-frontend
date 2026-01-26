@@ -16,5 +16,9 @@ export function useOnlineStatus() {
         };
     }, []);
 
+    useEffect(() => {
+        console.log(`User is now ${online ? 'online' : 'offline'}`);
+    }, [online]);
+
     return online;
 }

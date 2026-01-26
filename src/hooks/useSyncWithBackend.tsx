@@ -12,9 +12,9 @@ export const useSyncWithBackend = () => {
             if(online && isUserLoggedIn) {
                 const syncWasPerformed = await syncWithBackend(tokenData.access_token);
                 if (syncWasPerformed) {
-                    console.log("Hook sync with backend done.");
+                    console.log("Hook sync with backend done without any errors.");
                 } else {
-                    console.log("Hook sync with backend could not be done.")
+                    console.log("Hook sync with backend had at least one error.")
                 }
             }
         })();

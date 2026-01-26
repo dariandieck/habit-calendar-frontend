@@ -1,10 +1,10 @@
-import {clearAllData, getSyncQueue} from './db.service.ts';
+import {getSyncQueue, removeItemFromStoreWithID} from './db.service.ts';
 import { removeFromSyncQueue } from './db.service.ts';
-import type {SyncItem} from "../types/syncpayload.ts";
+import type {SyncItem} from "../types/syncPayload.ts";
 
 export async function syncWithBackend(token: string) {
     const syncData: SyncItem[] = await getSyncQueue()
-    let performed = true;
+    let onlySuccessFull = true;
     if(syncData.length > 0) {
         console.log("Trying to Sync the following data with Backend")
         console.log(syncData);
@@ -24,15 +24,13 @@ export async function syncWithBackend(token: string) {
 
                 // Erfolgreich gesendet → aus Queue entfernen
                 await removeFromSyncQueue(item.indexed_db_q_id);
-                // And here at least one item was synced to the backend, so it was "performed"
+                await removeItemFromStoreWithID(item.store_name, item.indexed_db_id)
             } else {
                 console.warn(
                     `Sync fehlgeschlagen für queueId ${item.indexed_db_q_id}, Status: ${res.status}`
                 );
                 console.warn(`item: ${JSON.stringify(item)}`);
-                performed = false;
-                // Breche Schleife ab, damit wir es später nochmal versuchen
-                break;
+                onlySuccessFull = false;
             }
         } catch (err) {
             console.error(
@@ -40,13 +38,8 @@ export async function syncWithBackend(token: string) {
                 (err as Error).message
             );
             // Offline oder Netzwerkfehler → Schleife abbrechen, retry beim nächsten Online
-            performed = false;
-            break;
+            onlySuccessFull = false;
         }
     }
-
-    if (performed) {
-        await clearAllData();
-    }
-    return performed;
+    return onlySuccessFull;
 }
