@@ -5,7 +5,6 @@ import {useSyncWithBackend} from "./hooks/useSyncWithBackend.tsx";
 import {useLoadAllAppData} from "./hooks/useLoadAllAppData.tsx";
 
 export function App() {
-
     useLocationChanged();
     useAccessTokenExpireTimer();
     useSyncWithBackend();

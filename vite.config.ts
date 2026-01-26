@@ -14,9 +14,10 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
+      includeAssets: ['apple-touch-icon.png'],
       manifest: {
         name: 'Daily Habit Calendar',
-        short_name: 'Calendar',
+        short_name: 'Habit Calendar',
         start_url: '/',
         display: 'standalone',
         background_color: '#fff',
@@ -24,6 +25,11 @@ export default defineConfig({
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'apple-touch-icon.png',
+            sizes: '180x180',
+            type: 'image/png'
+          }
         ],
       },
     }),
