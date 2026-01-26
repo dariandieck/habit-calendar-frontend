@@ -1,6 +1,6 @@
 import type {Entry} from "../../types/entry.ts";
 import type {Habit} from "../../types/habit.ts";
-import {useConfetti} from "../../hooks/useConfetti.ts";
+import {useConfetti} from "../../hooks/useConfetti.tsx";
 import {
     bad_highThresh, bad_lowThresh, good_highThresh, good_lowThresh, isBadScore, isGoodScore, isPerfectScore,
     isWorstScore

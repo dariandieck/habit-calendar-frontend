@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type {Habit} from '../../types/habit.ts';
 import {RainbowButton} from "../ui/RainbowButton.tsx";
+import {useSessionStorageState} from "../../hooks/useSessionStorageState.tsx";
 
 type Props = {
     onSubmit: (habits: Habit[]) => void;
@@ -20,7 +21,7 @@ type LengthConflictState = {
 };
 
 export function HabitsInputForm({ onSubmit }: Props) {
-    const [habits, setHabits] = useState<Habit[]>([{ name: "", description: "" }]);
+    const [habits, setHabits] = useSessionStorageState<Habit[]>("habits", [{ name: "", description: "" }]);
     const [errors, setErrors] = useState<ErrorState>({});
     const [lengthConflicts, setLengthConflicts] = useState<LengthConflictState>({});
     const [isSaving, setIsSaving] = useState(false);
@@ -144,6 +145,7 @@ export function HabitsInputForm({ onSubmit }: Props) {
                     <div className="flex flex-col sm:flex-row gap-3 items-start">
                         <input
                             type="text"
+                            disabled={isSaving}
                             value={habit.name}
                             onChange={e => updateHabit(i, "name", e.target.value)}
                             placeholder={`Name ${i + 1}. Habit`}
@@ -155,6 +157,7 @@ export function HabitsInputForm({ onSubmit }: Props) {
                         />
                         <input
                             type="text"
+                            disabled={isSaving}
                             value={habit.description}
                             onChange={e => updateHabit(i, "description", e.target.value)}
                             placeholder={`Beschreibung ${i + 1}. Habit`}
@@ -166,6 +169,7 @@ export function HabitsInputForm({ onSubmit }: Props) {
 
                         <div className="sm:hidden flex justify-center mt-2 w-full">
                             <button
+                                disabled={isSaving}
                                 type="button"
                                 onClick={() => removeHabit(i)}
                                 className="flex items-center gap-2 px-6 py-2 bg-white border-2 border-pink-200
@@ -179,6 +183,7 @@ export function HabitsInputForm({ onSubmit }: Props) {
 
                         <div className="hidden sm:block lg:block flex items-center align-middle justify-center m-auto">
                             <button
+                                disabled={isSaving}
                                 type="button"
                                 onClick={() => removeHabit(i)}
                                 className="p-3 text-lg hover:bg-red-100 rounded-full transition-all active:scale-70"
@@ -192,6 +197,7 @@ export function HabitsInputForm({ onSubmit }: Props) {
             <div className="flex justify-center mt-2">
                 <button
                     type="button"
+                    disabled={isSaving}
                     onClick={addEmptyHabit}
                     className="flex items-center gap-2 px-6 py-2 bg-white border-2 border-pink-200
                         text-pink-400 rounded-full text-sm font-bold shadow-sm

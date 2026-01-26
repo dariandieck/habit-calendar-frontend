@@ -18,6 +18,7 @@ export function WelcomePage() {
             const db_habits_with_id: Habit[] = await getHabits(tokenData.access_token)
             setHabits(db_habits_with_id)
             localStorage.setItem("habits", JSON.stringify(db_habits_with_id));
+            sessionStorage.removeItem("habits");
             console.log(`Saved ${habits.length} habits in the backend. Going to main page.`);
             navigate(MAIN_PAGE); // geht zur Hauptseite
         } catch (error) {

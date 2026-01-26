@@ -9,7 +9,7 @@ export function DonePage() {
         if (!isUserLoggedIn) return;
 
         const duration = 4000
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+        const defaults = { startVelocity: 30, spread: 360, ticks: 100, zIndex: 0};
         const animationEnd = Date.now() + duration;
         const randomInRange =
             (min: number, max: number) => Math.random() * (max - min) + min;

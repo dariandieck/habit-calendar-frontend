@@ -10,6 +10,7 @@ import {useAuthContext} from "../../context/AuthContext.tsx";
 import {tryFetchMotivationalSpeechFromBackend} from "../../services/fetch.service.ts";
 import {MainBanner} from "./MainBanner.tsx";
 import {useAppDataContext} from "../../context/AppDataContext.tsx";
+import {useSessionStorageState} from "../../hooks/useSessionStorageState.tsx";
 
 interface MainFormProps {
     handleSubmit: (entries: Entry[], formDay: DayKeyFields, motivationalSpeech: string) => Promise<void>
@@ -23,12 +24,10 @@ export function MainForm({handleSubmit}: MainFormProps) {
         day: "",
         speech: "konnte nicht geladen werden 🥺"
     });
-    const [entries, setEntries] = useState((): Entry[] => {
-        return habits.map(h => (
-            {h_id: h.h_id!, score: 50, day: ""}
-        ));
-    });
-    const [formDay, setFormDay] = useState<DayKeyFields>({
+    const [entries, setEntries] = useSessionStorageState<Entry[]>("entries",
+        habits.map(h=> ({h_id: h.h_id!, score: 50, day: ""}))
+    );
+    const [formDay, setFormDay] = useSessionStorageState<DayKeyFields>("formDay", {
         how_are_you_field: "", stress_field: "", good_field: "", why_good_field: "", bad_field: "", improve_field: ""
     });
 
@@ -71,7 +70,7 @@ export function MainForm({handleSubmit}: MainFormProps) {
 
             <MainBanner />
 
-            <PersonalInputFieldsForm formDay={formDay} setFormDay={setFormDay}/>
+            <PersonalInputFieldsForm isSaving={isSaving} formDay={formDay} setFormDay={setFormDay}/>
 
             <MotivationalSpeechBlock motivationalSpeech={motivationalSpeech.speech}/>
 

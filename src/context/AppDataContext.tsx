@@ -77,22 +77,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (habits.length > 0) {
             console.log(`Found ${habits.length} habits in localstorage.`);
             setHabits(habits);
-            setIsDataLoaded(true);
-            return;
         }
-        console.log("No Habits found locally. Looking in the backend next.");
 
-        if (!isUserLoggedIn) {
-            console.log("Can not get habits from backend. User does not have a valid session. " +
-                "He needs to log in before fetching the Habits.");
-        } else if (isBackendAwake) {
+        if (isUserLoggedIn && isBackendAwake) {
+            console.log("Since the backend is awake and the user is logged in, replacing the habits in local" +
+                " storage with the ones from the backend (ssot)");
             const habits: Habit[] = await tryFetchHabitsFromBackend(tokenData.access_token);
             setHabits(habits);
+            localStorage.setItem("habits", JSON.stringify(habits));
             if (habits.length === 0) {
-                console.log("No habits were (found/)fetched.")
+                console.log("No habits were (found/)fetched from the backend.")
             } else {
-                localStorage.setItem("habits", JSON.stringify(habits));
-                console.log(`${habits.length} habits have been (found/)fetched.`);
+                console.log(`${habits.length} habits have been (found/)fetched from the backend.`);
             }
         }
 

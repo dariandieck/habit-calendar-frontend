@@ -20,7 +20,7 @@ export type DayKeyFields = {
 }
 export const keyFieldMap: DayKeyFields = {
     how_are_you_field: "Wie geht es dir heute überhaupt?",
-    stress_field: "Erlebst du gerade Stress?",
+    stress_field: "Fühlst du gerade Stress? (Wenn ja was für ein Stress, warum?)",
     good_field: "Was lief heute besonders gut?",
     why_good_field: "Warum lief das so gut heute?",
     bad_field: "Was lief heute nicht so gut?",

@@ -3,11 +3,13 @@ import type {Entry} from "../types/entry.ts";
 import type {Day} from "../types/day.ts";
 import type { SyncPayload, SyncItem} from "../types/syncpayload.ts";
 import {BASE_URL} from "./api.service.ts";
+import type {EmailSend} from "../types/emailSend.ts";
 
 const DB_NAME = 'daily-calendar';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 const DAY_STORE = 'days';
 const ENTRY_STORE = 'entries';
+const EMAIL_STORE = 'emails';
 const SYNC_STORE = 'syncQueue';
 
 // --- IndexedDB Initialisierung ---
@@ -28,6 +30,14 @@ function getDB() {
                 if (!db.objectStoreNames.contains(ENTRY_STORE)) {
                     db.createObjectStore(ENTRY_STORE, {
                         keyPath: 'indexed_db_e_id',
+                        autoIncrement: true
+                    });
+                }
+
+                // Email Store
+                if (!db.objectStoreNames.contains(EMAIL_STORE)) {
+                    db.createObjectStore(EMAIL_STORE, {
+                        keyPath: 'indexed_db_email_id',
                         autoIncrement: true
                     });
                 }
@@ -73,6 +83,15 @@ export async function trySaveDayLocalAndSyncLaterOn(day: Day): Promise<void> {
     await tx.done;
 
     await addToSyncQueue("/days", day)
+}
+
+export async function trySaveEmailLocalAndSyncLaterOn(email: EmailSend): Promise<void> {
+    const db = await getDB();
+    const tx = db.transaction(EMAIL_STORE, 'readwrite');
+    tx.store.put(email)
+    await tx.done;
+
+    await addToSyncQueue("/sendemail", email)
 }
 
 // ---------------------------

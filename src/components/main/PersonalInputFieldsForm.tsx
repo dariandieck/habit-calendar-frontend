@@ -2,10 +2,11 @@ import {type DayKeyFields, keyFieldMap} from "../../types/day.ts";
 
 interface PersonalInputFieldsFormProps {
     formDay: DayKeyFields,
-    setFormDay: (value: (((prevState: DayKeyFields) => DayKeyFields) | DayKeyFields)) => void
+    setFormDay: (value: (((prevState: DayKeyFields) => DayKeyFields) | DayKeyFields)) => void,
+    isSaving: boolean
 }
 
-export function PersonalInputFieldsForm({setFormDay, formDay}: PersonalInputFieldsFormProps) {
+export function PersonalInputFieldsForm({setFormDay, formDay, isSaving}: PersonalInputFieldsFormProps) {
 
     const handleFieldValueChange = (field: keyof DayKeyFields, value: string) => {
         setFormDay(prev => ({
@@ -28,6 +29,7 @@ export function PersonalInputFieldsForm({setFormDay, formDay}: PersonalInputFiel
                             </label>
                             <textarea
                                 value={formDay[k] || ""}
+                                disabled={isSaving}
                                 onChange={event =>
                                     handleFieldValueChange(k, event.target.value)}
                                 className="w-full p-4 rounded-2xl border-2 border-pink-50 bg-white/50
