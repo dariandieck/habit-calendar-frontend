@@ -9,11 +9,10 @@ export const useLoadAllAppData = () => {
 
     useEffect(() => {
         (async () => {
-            console.log(`First time: ${isFirstTime} | isUserLoggedIn: ${isUserLoggedIn}`);
             if(isFirstTime || isUserLoggedIn) {
                 if(isFirstTime) setIsFirstTime(false);
                 await loadAllAppData();
             }
         })();
-    }, [isFirstTime, isUserLoggedIn, loadAllAppData]);
+    }, [loadAllAppData]);
 }
