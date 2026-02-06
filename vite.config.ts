@@ -18,7 +18,8 @@ export default defineConfig({
       manifest: {
         name: 'Daily Habit Calendar',
         short_name: 'Habit Calendar',
-        start_url: '/',
+        start_url: '/habit-calendar-frontend',
+        scope: '/habit-calendar-frontend',
         display: 'standalone',
         background_color: '#fff',
         theme_color: '#ffb6c1',
