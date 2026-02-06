@@ -32,5 +32,5 @@ export default defineConfig({
       },
     }),
   ],
-  "base": 'habit-calendar-frontend',
+  base: 'habit-calendar-frontend',
 })
