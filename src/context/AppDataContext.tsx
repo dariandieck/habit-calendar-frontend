@@ -5,9 +5,10 @@ import * as React from "react";
 import {
     tryFetchDayFromIndexedDB, tryFetchHabitsFromBackend,
     tryFetchIsBackendAwake,
-    tryFetchIsTodayDayFromBackend, tryFetchLocalHabits
+    tryFetchIsTodayDayFromBackend, tryFetchIsYesterdayDayFromBackend, tryFetchLocalHabits
 } from "../services/fetch.service.ts";
 import {useAuthContext} from "./AuthContext.tsx";
+import {useSessionStorageState} from "../hooks/useSessionStorageState.tsx";
 
 type AppDataContextType = {
     habits: Habit[];
@@ -16,11 +17,17 @@ type AppDataContextType = {
     setTodayDay: React.Dispatch<React.SetStateAction<Day | null>>;
     isTodayDay: boolean;
     setIsTodayDay: React.Dispatch<React.SetStateAction<boolean>>;
+    isYesterdayDay: boolean;
+    setIsYesterdayDay: React.Dispatch<React.SetStateAction<boolean>>;
     isBackendAwake: boolean;
     setIsBackendAwake: React.Dispatch<React.SetStateAction<boolean>>;
+    isYesterdaysMainForm: boolean;
+    setIsYesterdaysMainForm: React.Dispatch<React.SetStateAction<boolean>>;
+    isShowAddYesterdaysEntryPopup: boolean;
+    setIsShowAddYesterdaysEntryPopup: React.Dispatch<React.SetStateAction<boolean>>;
     isDataLoaded: boolean;
     setIsDataLoaded:  React.Dispatch<React.SetStateAction<boolean>>;
-    loadAllAppData: () => Promise<void>
+    loadAllAppData: () => Promise<void>;
 };
 
 
@@ -32,8 +39,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     const [habits, setHabits] = useState<Habit[]>([]);
     const [todayDay, setTodayDay] = useState<Day | null>(null);
     const [isTodayDay, setIsTodayDay] = useState<boolean>(false)
+    const [isYesterdayDay, setIsYesterdayDay] = useState<boolean>(false)
     const [isBackendAwake, setIsBackendAwake] = useState<boolean>(false);
     const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
+    const [isYesterdaysMainForm, setIsYesterdaysMainForm] = useSessionStorageState<boolean>("isYesterdaysMainForm", false);
+    const [isShowAddYesterdaysEntryPopup, setIsShowAddYesterdaysEntryPopup] = useState<boolean>(true);
 
     const loadAllAppData = useCallback(async () => {
         console.log("(Re)loading all the app data...");
@@ -59,16 +69,26 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         }
         console.log("No day entry for today found in indexed db. Looking in the backend next.");
 
+
+
         if (isBackendAwake) {
+            const isYesterdayDayFromBackend = await tryFetchIsYesterdayDayFromBackend();
+            if (isYesterdayDayFromBackend) {
+                console.log("Confirmed that there is a day entry for yesterday from the backend.")
+                setIsYesterdayDay(true);
+            } else {
+                console.log("Confirmed that there is NO day entry for yesterday from the backend.")
+            }
+
             const isTodayDayFromBackend = await tryFetchIsTodayDayFromBackend();
             if (isTodayDayFromBackend) {
                 // before the user is even logged in we get to know if there is a day for today. Then same logic applies
                 console.log("Confirmed that there is a day for today from the backend.")
                 setIsTodayDay(true);
                 setIsDataLoaded(true);
-                return;
+            } else {
+                console.log("Confirmed that there no day for today from the backend. Looking for the habits next.")
             }
-            console.log("Confirmed that there no day for today from the backend. Looking for the habits next.")
         }
 
 
@@ -101,7 +121,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             habits, setHabits,
             todayDay, setTodayDay,
             isTodayDay, setIsTodayDay,
+            isYesterdayDay, setIsYesterdayDay,
             isBackendAwake, setIsBackendAwake,
+            isYesterdaysMainForm, setIsYesterdaysMainForm,
+            isShowAddYesterdaysEntryPopup: isShowAddYesterdaysEntryPopup, setIsShowAddYesterdaysEntryPopup: setIsShowAddYesterdaysEntryPopup,
             isDataLoaded, setIsDataLoaded,
             loadAllAppData
         }}>

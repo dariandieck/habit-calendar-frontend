@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type {Habit} from '../../types/habit.ts';
 import {RainbowButton} from "../ui/RainbowButton.tsx";
-import {useSessionStorageState} from "../../hooks/useSessionStorageState.tsx";
 
 type Props = {
     onSubmit: (habits: Habit[]) => void;
@@ -21,7 +20,7 @@ type LengthConflictState = {
 };
 
 export function HabitsInputForm({ onSubmit }: Props) {
-    const [habits, setHabits] = useSessionStorageState<Habit[]>("habits", [{ name: "", description: "" }]);
+    const [habits, setHabits] = useState<Habit[]>([{ name: "", description: "" }]);
     const [errors, setErrors] = useState<ErrorState>({});
     const [lengthConflicts, setLengthConflicts] = useState<LengthConflictState>({});
     const [isSaving, setIsSaving] = useState(false);

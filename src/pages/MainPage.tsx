@@ -5,34 +5,31 @@ import {
     trySaveEmailLocalAndSyncLaterOn,
     trySaveEntriesLocalAndSyncLaterOn
 } from "../services/db.service.ts";
-import {useNavigate} from "react-router-dom";
 import type {Entry} from "../types/entry.ts";
 import {syncWithBackend} from "../services/sync.service.ts";
-import {DONE_PAGE} from "../routes/RouteRedirector.tsx";
-import {getToday} from "../utils/utils.ts";
+import {getToday, getYesterday} from "../utils/utils.ts";
 import {useAuthContext} from "../context/AuthContext.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {MainForm} from "../components/main/MainForm.tsx";
 
 export function MainPage() {
     const { tokenData } = useAuthContext();
-    const { setIsTodayDay } = useAppDataContext();
-    const navigate = useNavigate();
+    const { setIsTodayDay, isYesterdaysMainForm, setIsYesterdayDay, setIsYesterdaysMainForm } = useAppDataContext();
 
     const handleSubmit = async (
             entries: Entry[], formDay: DayKeyFields, motivationalSpeech: string) => {
 
         const created_at = new Date().toISOString()
-        const today = getToday();
+        const day = isYesterdaysMainForm ? getYesterday() : getToday();
 
         const dbEntries: Entry[] = entries.map(entry => ({
             ...entry,
-            day: today
+            day: day
         }));
 
         const dbDay: Day = {
             ...formDay,
-            day: today,
+            day: day,
             created_at: created_at,
             motivation_field: motivationalSpeech
         }
@@ -42,7 +39,7 @@ export function MainPage() {
         // send email
         await trySaveEmailLocalAndSyncLaterOn({day: dbDay, entries: dbEntries});
 
-        console.log(`Day saved for the day "${today}". Navigating to done page.`);
+        console.log(`Day saved for the day "${day}" (${isYesterdaysMainForm ? "Yesterday" : "Today"}). Navigating to done page.`);
         const synced = await syncWithBackend(tokenData.access_token);
         if (!synced) {
             console.log("Errors while syncing data with backend. But the items are in the " +
@@ -50,12 +47,16 @@ export function MainPage() {
         } else {
             console.log("Sync with backend completed right away without any errors.")
         }
-        sessionStorage.removeItem("entries");
-        sessionStorage.removeItem("formDay");
 
-        setIsTodayDay(true);
+        if(isYesterdaysMainForm) {
+            setIsYesterdayDay(true);
+            setIsYesterdaysMainForm(false);
+        } else {
+            setIsTodayDay(true);
+        }
 
-        navigate(DONE_PAGE); // geht zur Done page
+        sessionStorage.removeItem(`${isYesterdaysMainForm ? "yesterday" : "today"}_entries`);
+        sessionStorage.removeItem(`${isYesterdaysMainForm ? "yesterday" : "today"}_formDay`);
     }
 
     return (
@@ -65,7 +66,7 @@ export function MainPage() {
 
                 <MainHeader />
 
-                <MainForm handleSubmit={handleSubmit}/>
+                <MainForm key={isYesterdaysMainForm ? "yesterday" : "today"} handleSubmit={handleSubmit}/>
 
             </div>
         </div>

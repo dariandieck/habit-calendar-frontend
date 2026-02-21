@@ -8,23 +8,21 @@ export const MAIN_PAGE: string = "/";
 export const WELCOME_PAGE: string = "/welcome";
 export const DONE_PAGE: string = "/done";
 
-interface RouteRedirectorProps {
-    isTodayDay: boolean;
-}
-
-export function RouteRedirector({ isTodayDay }: RouteRedirectorProps) {
-    const { habits } = useAppDataContext();
+export function RouteRedirector() {
+    const { habits, isYesterdaysMainForm, isTodayDay } = useAppDataContext();
 
     return (
         <Routes>
             <Route
                 path={MAIN_PAGE}
                 element={
-                    isTodayDay
-                        ? <Navigate to={DONE_PAGE} replace />
-                        : habits.length > 0
-                            ? <MainPage />
-                            : <Navigate to={WELCOME_PAGE} replace />
+                    isYesterdaysMainForm
+                        ? <MainPage />
+                        : isTodayDay
+                            ? <Navigate to={DONE_PAGE} replace />
+                            : habits.length > 0
+                                ? <MainPage />
+                                : <Navigate to={WELCOME_PAGE} replace />
                 }
             />
 
@@ -40,9 +38,11 @@ export function RouteRedirector({ isTodayDay }: RouteRedirectorProps) {
             <Route
                 path={DONE_PAGE}
                 element={
-                    isTodayDay
-                        ? <DonePage />
-                        : <Navigate to={MAIN_PAGE} replace />
+                    isYesterdaysMainForm
+                        ? <Navigate to={MAIN_PAGE} replace />
+                        : isTodayDay
+                            ? <DonePage />
+                            : <Navigate to={MAIN_PAGE} replace />
                 }
             />
 

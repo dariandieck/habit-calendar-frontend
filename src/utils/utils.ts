@@ -5,6 +5,10 @@ export function getToday(): string {
     return new Date().toISOString().slice(0, 10);
 }
 
+export function getYesterday(): string {
+    return new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+}
+
 export function logUserOut(setLoginTokenData: React.Dispatch<React.SetStateAction<TokenData>>){
     localStorage.removeItem("access_token");
     localStorage.removeItem("exp");

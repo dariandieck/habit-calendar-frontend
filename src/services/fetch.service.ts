@@ -1,5 +1,5 @@
 import {getDay, getHabits, getIsDay, getMotivationalSpeech, pingBackend} from "./api.service.ts";
-import {getToday} from "../utils/utils.ts";
+import {getToday, getYesterday} from "../utils/utils.ts";
 import type {Habit} from "../types/habit.ts";
 import type {Day} from "../types/day.ts";
 import {getLocalDays} from "./db.service.ts";
@@ -14,10 +14,17 @@ export const tryFetchIsBackendAwake = async () => {
         return false;
     }
 };
+
 export const tryFetchIsTodayDayFromBackend = async () => {
     const res: boolean | undefined = await getIsDay(getToday())
     return !!res;
 }
+
+export const tryFetchIsYesterdayDayFromBackend = async () => {
+    const res: boolean | undefined = await getIsDay(getYesterday())
+    return !!res;
+}
+
 export const tryFetchLocalHabits = (): Habit[] => {
     const habitsString: string | null = localStorage.getItem("habits");
     if (habitsString) {

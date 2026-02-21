@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import {useAuthContext} from "../context/AuthContext.tsx";
+import {useAppDataContext} from "../context/AppDataContext.tsx";
 
 export function DonePage() {
     const { isUserLoggedIn } = useAuthContext();
+    const { isShowAddYesterdaysEntryPopup, isYesterdaysMainForm } = useAppDataContext();
+    
 
     useEffect(() => {
-        if (!isUserLoggedIn) return;
+        if (!isUserLoggedIn || (isShowAddYesterdaysEntryPopup && isYesterdaysMainForm)) return;
 
         const duration = 4000
         const defaults = { startVelocity: 30, spread: 360, ticks: 100, zIndex: 0};
@@ -30,7 +33,7 @@ export function DonePage() {
 
 
         return () => {clearInterval(interval);};
-    }, [isUserLoggedIn]);
+    }, [isShowAddYesterdaysEntryPopup, isUserLoggedIn]);
 
 
     return (

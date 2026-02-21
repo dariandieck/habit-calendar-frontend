@@ -17,17 +17,17 @@ interface MainFormProps {
 }
 
 export function MainForm({handleSubmit}: MainFormProps) {
-    const { habits } = useAppDataContext();
+    const { habits, isYesterdaysMainForm } = useAppDataContext();
     const { isUserLoggedIn, tokenData } = useAuthContext();
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [motivationalSpeech, setMotivationalSpeech] = useState<MotivationalSpeech>({
         day: "",
         speech: "konnte nicht geladen werden 🥺"
     });
-    const [entries, setEntries] = useSessionStorageState<Entry[]>("entries",
+    const [entries, setEntries] = useSessionStorageState<Entry[]>(`${isYesterdaysMainForm ? "yesterday" : "today"}_entries`,
         habits.map(h=> ({h_id: h.h_id!, score: 50, day: ""}))
     );
-    const [formDay, setFormDay] = useSessionStorageState<DayKeyFields>("formDay", {
+    const [formDay, setFormDay] = useSessionStorageState<DayKeyFields>(`${isYesterdaysMainForm ? "yesterday" : "today"}_formDay`, {
         how_are_you_field: "", stress_field: "", good_field: "", why_good_field: "", bad_field: "", improve_field: ""
     });
 

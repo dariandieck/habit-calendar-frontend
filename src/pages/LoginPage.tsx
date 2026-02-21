@@ -26,8 +26,8 @@ export function LoginPage() {
     };
 
     return (
-        <div className="login-overlay flex justify-center items-start">
-            <div className="flex justify-center items-baseline-last p-4">
+        <div className="login-overlay flex justify-center items-start p-4">
+            <div className="flex justify-center items-baseline-last">
                 <div
                     className="w-full max-w-md bg-white backdrop-blur-xl p-10 rounded-3xl
                     shadow-2xl border border-pink-100 text-center">
