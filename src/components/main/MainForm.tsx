@@ -11,6 +11,7 @@ import {tryFetchMotivationalSpeechFromBackend} from "../../services/fetch.servic
 import {MainBanner} from "./MainBanner.tsx";
 import {useAppDataContext} from "../../context/AppDataContext.tsx";
 import {useSessionStorageState} from "../../hooks/useSessionStorageState.tsx";
+import {getToday, getYesterday} from "../../utils/utils.ts";
 
 interface MainFormProps {
     handleSubmit: (entries: Entry[], formDay: DayKeyFields, motivationalSpeech: string) => Promise<void>
@@ -37,7 +38,7 @@ export function MainForm({handleSubmit}: MainFormProps) {
             if (!isUserLoggedIn) return;
 
             const motivationalSpeech = await tryFetchMotivationalSpeechFromBackend(
-                tokenData.access_token);
+                tokenData.access_token, isYesterdaysMainForm ? getYesterday() : getToday());
             if (motivationalSpeech) {
                 setMotivationalSpeech(motivationalSpeech)
                 console.log("Got a motivational speech for today.")
@@ -45,7 +46,7 @@ export function MainForm({handleSubmit}: MainFormProps) {
                 console.log("Motivational speech for today is null.")
             }
         })();
-    }, [isUserLoggedIn, tokenData.access_token]);
+    }, [isUserLoggedIn, isYesterdaysMainForm, tokenData.access_token]);
 
     const onSubmit = () => {
         setIsSaving(true);

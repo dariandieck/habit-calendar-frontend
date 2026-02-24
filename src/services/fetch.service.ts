@@ -68,9 +68,9 @@ export const tryFetchDayFromIndexedDB = async () => {
 }
 
 export const tryFetchMotivationalSpeechFromBackend
-    = async (access_token: string) => {
+    = async (access_token: string, day: string) => {
     try {
-        return await getMotivationalSpeech(access_token, getToday())
+        return await getMotivationalSpeech(access_token, day)
     } catch (e) {
         console.log("Error while trying to get motivational speech. Error:");
         console.error(e);
