@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {RainbowButton} from "../components/ui/RainbowButton.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {useNavigate} from "react-router-dom";
@@ -6,18 +6,24 @@ import {MAIN_PAGE} from "../routes/RouteRedirector.tsx";
 
 export function AddYesterdayPage() {
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const { isShowAddYesterdaysEntryPopup, setIsShowAddYesterdaysEntryPopup, setIsYesterdaysMainForm } = useAppDataContext();
+    const { setIsYesterdaysMainForm } = useAppDataContext();
+    const [hidePopup, setHidePopup] = useState<boolean>(false)
+    const [isDelay, setIsDelay] = useState<boolean>(true)
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setTimeout(() => setIsDelay(false), 3000);
+    }, []);
 
     const onSubmit = (yesPressed: boolean) => {
         if(!yesPressed) {
-            setIsShowAddYesterdaysEntryPopup(false);
+            setHidePopup(true);
             return;
         }
 
         setIsSaving(true);
         setTimeout(async () => {
-            setIsShowAddYesterdaysEntryPopup(false);
+            setHidePopup(true);
             setIsYesterdaysMainForm(true);
             navigate(MAIN_PAGE);
             setIsSaving(false);
@@ -27,7 +33,7 @@ export function AddYesterdayPage() {
 
     return (
         <>
-            {isShowAddYesterdaysEntryPopup && (
+            {(!hidePopup && !isDelay) && (
                 <div className="page-overlay flex justify-center items-start p-4">
                     <div className="flex justify-center items-baseline-last">
                         <div className="w-full max-w-md bg-white backdrop-blur-xl p-10 rounded-3xl

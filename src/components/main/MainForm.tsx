@@ -41,9 +41,9 @@ export function MainForm({handleSubmit}: MainFormProps) {
                 tokenData.access_token, isYesterdaysMainForm ? getYesterday() : getToday());
             if (motivationalSpeech) {
                 setMotivationalSpeech(motivationalSpeech)
-                console.log("Got a motivational speech for today.")
+                console.log(`Got a motivational speech for ${isYesterdaysMainForm ? "yesterday" : "today"}.`)
             } else {
-                console.log("Motivational speech for today is null.")
+                console.log(`Motivational speech for ${isYesterdaysMainForm ? "yesterday" : "today"} is null.`)
             }
         })();
     }, [isUserLoggedIn, isYesterdaysMainForm, tokenData.access_token]);
@@ -74,7 +74,6 @@ export function MainForm({handleSubmit}: MainFormProps) {
             <PersonalInputFieldsForm isSaving={isSaving} formDay={formDay} setFormDay={setFormDay}/>
 
             <MotivationalSpeechBlock motivationalSpeech={motivationalSpeech.speech}/>
-
 
             <RainbowButton isSubmit={false} isSaving={isSaving} onClick={onSubmit}
                            text={"Speichern ✨"} actionEmoji={"✨"} actionText={"Wird gespeichert..."}

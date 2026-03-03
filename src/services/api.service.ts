@@ -74,6 +74,22 @@ export async function getHabits(token: string): Promise<Habit[]> {
     return await res.json();
 }
 
+export async function getEntries(token: string): Promise<Entry[]> {
+    const res = await fetch(`${BASE_URL()}/entries`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!res.ok) {
+        throw new Error(res.status + ': Fehler beim laden der Entries');
+    }
+
+    return await res.json();
+}
+
 export async function getMotivationalSpeech(token: string, date: string): Promise<MotivationalSpeech | null> {
     const res = await fetch(`${BASE_URL()}/motivationalspeeches/${date}`, {
         method: 'GET',

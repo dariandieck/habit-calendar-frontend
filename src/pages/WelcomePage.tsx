@@ -1,11 +1,12 @@
 import {HabitsInputForm} from '../components/welcome/HabitsInputForm.tsx';
-import {addHabits, getHabits} from '../services/api.service.ts';
+import {addHabits} from '../services/api.service.ts';
 import type {Habit} from '../types/habit';
 import {useNavigate} from "react-router-dom";
 import {WelcomeLabel} from "../components/welcome/WelcomeLabel.tsx";
 import {MAIN_PAGE} from "../routes/RouteRedirector.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {useAuthContext} from "../context/AuthContext.tsx";
+import {tryFetchHabitsFromBackend} from "../services/fetch.service.ts";
 
 export function WelcomePage() {
     const { tokenData } = useAuthContext();
@@ -15,7 +16,7 @@ export function WelcomePage() {
     async function handleSubmit(habits: Habit[]) {
         try {
             await addHabits(tokenData.access_token, habits); // habits im backend speichern
-            const db_habits_with_id: Habit[] = await getHabits(tokenData.access_token)
+            const db_habits_with_id: Habit[] = await tryFetchHabitsFromBackend(tokenData.access_token)
             setHabits(db_habits_with_id)
             localStorage.setItem("habits", JSON.stringify(db_habits_with_id));
             console.log(`Saved ${habits.length} habits in the backend. Going to main page.`);

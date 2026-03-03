@@ -3,10 +3,12 @@ import { WelcomePage } from "../pages/WelcomePage.tsx";
 import { MainPage } from "../pages/MainPage.tsx";
 import { DonePage } from "../pages/DonePage.tsx";
 import { useAppDataContext } from "../context/AppDataContext.tsx";
+import {HabitSummaryPage} from "../pages/HabitSummaryPage.tsx";
 
 export const MAIN_PAGE: string = "/";
 export const WELCOME_PAGE: string = "/welcome";
 export const DONE_PAGE: string = "/done";
+export const HABIT_SUMMARY_PAGE: string = "/habit-summary";
 
 export function RouteRedirector() {
     const { habits, isYesterdaysMainForm, isTodayDay } = useAppDataContext();
@@ -43,6 +45,15 @@ export function RouteRedirector() {
                         : isTodayDay
                             ? <DonePage />
                             : <Navigate to={MAIN_PAGE} replace />
+                }
+            />
+
+            <Route
+                path={HABIT_SUMMARY_PAGE}
+                element={
+                    habits.length === 0
+                        ? <Navigate to={WELCOME_PAGE} replace />
+                        : <HabitSummaryPage />
                 }
             />
 

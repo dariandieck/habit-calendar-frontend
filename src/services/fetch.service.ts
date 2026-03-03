@@ -1,4 +1,4 @@
-import {getDay, getHabits, getIsDay, getMotivationalSpeech, pingBackend} from "./api.service.ts";
+import {getDay, getEntries, getHabits, getIsDay, getMotivationalSpeech, pingBackend} from "./api.service.ts";
 import {getToday, getYesterday} from "../utils/utils.ts";
 import type {Habit} from "../types/habit.ts";
 import type {Day} from "../types/day.ts";
@@ -38,6 +38,15 @@ export const tryFetchHabitsFromBackend= async (access_token: string) => {
         return await getHabits(access_token);
     } catch (err) {
         console.log('Error while requesting habits from backend. Error:');
+        console.error(err);
+        return [];
+    }
+};
+export const tryFetchEntriesFromBackend= async (access_token: string) => {
+    try {
+        return await getEntries(access_token);
+    } catch (err) {
+        console.log('Error while requesting entries from backend. Error:');
         console.error(err);
         return [];
     }

@@ -11,6 +11,8 @@ import {getToday, getYesterday} from "../utils/utils.ts";
 import {useAuthContext} from "../context/AuthContext.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {MainForm} from "../components/main/MainForm.tsx";
+import {GoToHabitSummaryCard} from "../components/done/GoToHabitSummaryCard.tsx";
+import {RainbowButton} from "../components/ui/RainbowButton.tsx";
 
 export function MainPage() {
     const { tokenData } = useAuthContext();
@@ -59,16 +61,42 @@ export function MainPage() {
         sessionStorage.removeItem(`${isYesterdaysMainForm ? "yesterday" : "today"}_formDay`);
     }
 
+    const handleGoBackToMainForm = () => {
+        setIsYesterdaysMainForm(false);
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
     return (
-        <div className="flex justify-center items-start p-4">
-            <div className="w-full max-w-2xl bg-white/80 backdrop-blur-xl p-6 md:p-10 rounded-3xl
-                shadow-xl border border-pink-100">
+        <>
+            <div className="flex justify-center items-start p-4">
+                <div className="w-full max-w-2xl bg-white/80 backdrop-blur-xl p-6 rounded-3xl
+                shadow-xl border border-pink-100 space-y-4">
+                    <MainHeader />
 
-                <MainHeader />
+                    <MainForm key={isYesterdaysMainForm ? "yesterday" : "today"} handleSubmit={handleSubmit}/>
 
-                <MainForm key={isYesterdaysMainForm ? "yesterday" : "today"} handleSubmit={handleSubmit}/>
+                    {isYesterdaysMainForm && (
+                        <div className="flex justify-center">
+                            <div className="w-full max-w-60">
+                                <RainbowButton
+                                    isSubmit={false}
+                                    isSaving={false}
+                                    text={"Zurück zum heutigen Tag"}
+                                    actionEmoji={""}
+                                    actionText={""}
+                                    onClick={handleGoBackToMainForm}
+                                />
+                            </div>
+                        </div>
+                    )}
 
+                </div>
             </div>
-        </div>
+
+            <GoToHabitSummaryCard/>
+        </>
     )
 }

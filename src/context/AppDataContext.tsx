@@ -3,16 +3,19 @@ import type { Habit } from "../types/habit";
 import type { Day } from "../types/day";
 import * as React from "react";
 import {
-    tryFetchDayFromIndexedDB, tryFetchHabitsFromBackend,
+    tryFetchDayFromIndexedDB, tryFetchEntriesFromBackend, tryFetchHabitsFromBackend,
     tryFetchIsBackendAwake,
     tryFetchIsTodayDayFromBackend, tryFetchIsYesterdayDayFromBackend, tryFetchLocalHabits
 } from "../services/fetch.service.ts";
 import {useAuthContext} from "./AuthContext.tsx";
 import {useSessionStorageState} from "../hooks/useSessionStorageState.tsx";
+import type {Entry} from "../types/entry.ts";
 
 type AppDataContextType = {
     habits: Habit[];
     setHabits: React.Dispatch<React.SetStateAction<Habit[]>>;
+    entries: Entry[];
+    setEntries: React.Dispatch<React.SetStateAction<Entry[]>>;
     todayDay: Day | null;
     setTodayDay: React.Dispatch<React.SetStateAction<Day | null>>;
     isTodayDay: boolean;
@@ -23,8 +26,6 @@ type AppDataContextType = {
     setIsBackendAwake: React.Dispatch<React.SetStateAction<boolean>>;
     isYesterdaysMainForm: boolean;
     setIsYesterdaysMainForm: React.Dispatch<React.SetStateAction<boolean>>;
-    isShowAddYesterdaysEntryPopup: boolean;
-    setIsShowAddYesterdaysEntryPopup: React.Dispatch<React.SetStateAction<boolean>>;
     isDataLoaded: boolean;
     setIsDataLoaded:  React.Dispatch<React.SetStateAction<boolean>>;
     loadAllAppData: () => Promise<void>;
@@ -43,7 +44,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     const [isBackendAwake, setIsBackendAwake] = useState<boolean>(false);
     const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
     const [isYesterdaysMainForm, setIsYesterdaysMainForm] = useSessionStorageState<boolean>("isYesterdaysMainForm", false);
-    const [isShowAddYesterdaysEntryPopup, setIsShowAddYesterdaysEntryPopup] = useState<boolean>(true);
+    const [entries, setEntries] = useState<Entry[]>([]);
 
     const loadAllAppData = useCallback(async () => {
         console.log("(Re)loading all the app data...");
@@ -64,12 +65,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             console.log("Loaded today's day entry from indexed db.");
             setTodayDay(todayDayIndexedDB)
             setIsTodayDay(true);
-            setIsDataLoaded(true);
-            return;
         }
         console.log("No day entry for today found in indexed db. Looking in the backend next.");
-
-
 
         if (isBackendAwake) {
             const isYesterdayDayFromBackend = await tryFetchIsYesterdayDayFromBackend();
@@ -85,14 +82,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
                 // before the user is even logged in we get to know if there is a day for today. Then same logic applies
                 console.log("Confirmed that there is a day for today from the backend.")
                 setIsTodayDay(true);
-                setIsDataLoaded(true);
             } else {
                 console.log("Confirmed that there no day for today from the backend. Looking for the habits next.")
             }
         }
 
-
-        // anything below here is when we don't have a day
         const habits: Habit[] = tryFetchLocalHabits();
         if (habits.length > 0) {
             console.log(`Found ${habits.length} habits in localstorage.`);
@@ -110,8 +104,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             } else {
                 console.log(`${habits.length} habits have been (found/)fetched from the backend.`);
             }
-        }
 
+            const entries: Entry[] = await tryFetchEntriesFromBackend(tokenData.access_token);
+            if(entries.length > 0) {
+                console.log(`Fetched ${entries.length} entries from the backend.`);
+                setEntries(entries);
+            }
+        }
         setIsDataLoaded(true)
         console.log("Finished (re)loading all the app data!");
     }, [isUserLoggedIn, tokenData.access_token]);
@@ -119,12 +118,12 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     return (
         <AppDataContext.Provider value={{
             habits, setHabits,
+            entries, setEntries,
             todayDay, setTodayDay,
             isTodayDay, setIsTodayDay,
             isYesterdayDay, setIsYesterdayDay,
             isBackendAwake, setIsBackendAwake,
             isYesterdaysMainForm, setIsYesterdaysMainForm,
-            isShowAddYesterdaysEntryPopup: isShowAddYesterdaysEntryPopup, setIsShowAddYesterdaysEntryPopup: setIsShowAddYesterdaysEntryPopup,
             isDataLoaded, setIsDataLoaded,
             loadAllAppData
         }}>
