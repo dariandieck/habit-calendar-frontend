@@ -19,7 +19,7 @@ export function HabitsInputSliderForm({setEntries, entries}: HabitsInputSliderFo
     };
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-7">
             {habits.map(h => {
                 // find the entry belonging to this habit
                 const entry: Entry = entries.find(e => e.h_id === h.h_id)!

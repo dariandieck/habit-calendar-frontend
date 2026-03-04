@@ -26,7 +26,7 @@ export function EntrySlider(
     return (
         <>
             <div className="flex justify-between items-end mb-2">
-                <div className="max-w-[80%]">
+                <div className="max-w-[65%]">
                     <div className="font-bold text-gray-800 flex items-center gap-2">
                         <p className="truncate">{habit.name}</p>
                     </div>

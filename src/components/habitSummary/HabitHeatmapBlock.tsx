@@ -26,7 +26,7 @@ export function HabitHeatmapBlock({ habit, habitEntries, visibleDays, colorRGB }
 
     return (
         <div className="bg-white/50 rounded-2xl p-6 border border-pink-50 shadow-sm transition-all hover:shadow-xl">
-            <div className="max-w-[80%] mb-1">
+            <div className="max-w-full mb-1">
                 <div className="font-bold text-gray-800 flex items-center gap-2">
                     <p className="truncate">{habit.name}</p>
                 </div>

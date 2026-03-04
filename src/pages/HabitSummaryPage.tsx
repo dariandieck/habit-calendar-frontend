@@ -14,12 +14,6 @@ export function HabitSummaryPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const goToTop = () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
         const handleResize = () => {
             const currentWidth = window.innerWidth;
             const smallest = 500;
@@ -30,8 +24,6 @@ export function HabitSummaryPage() {
 
             setDaysToShow(weeks * 7);
         };
-
-        goToTop();
         handleResize();
 
         window.addEventListener('resize', handleResize);

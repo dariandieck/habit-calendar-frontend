@@ -11,7 +11,7 @@ import {getToday, getYesterday} from "../utils/utils.ts";
 import {useAuthContext} from "../context/AuthContext.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {MainForm} from "../components/main/MainForm.tsx";
-import {GoToHabitSummaryCard} from "../components/done/GoToHabitSummaryCard.tsx";
+import {GoToHabitSummaryCard} from "../components/ui/GoToHabitSummaryCard.tsx";
 import {RainbowButton} from "../components/ui/RainbowButton.tsx";
 
 export function MainPage() {
@@ -96,7 +96,7 @@ export function MainPage() {
                 </div>
             </div>
 
-            <GoToHabitSummaryCard/>
+            <GoToHabitSummaryCard small={false}/>
         </>
     )
 }

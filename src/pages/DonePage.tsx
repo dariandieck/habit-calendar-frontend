@@ -3,18 +3,11 @@ import confetti from 'canvas-confetti';
 import {useAuthContext} from "../context/AuthContext.tsx";
 import {useAppDataContext} from "../context/AppDataContext.tsx";
 import {DoneCard} from "../components/done/DoneCard.tsx";
-import {GoToHabitSummaryCard} from "../components/done/GoToHabitSummaryCard.tsx";
+import {GoToHabitSummaryCard} from "../components/ui/GoToHabitSummaryCard.tsx";
 
 export function DonePage() {
     const { isUserLoggedIn } = useAuthContext();
     const { isYesterdaysMainForm } = useAppDataContext();
-
-    useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }, []);
 
     useEffect(() => {
         if (!isUserLoggedIn) return;
@@ -47,7 +40,7 @@ export function DonePage() {
     return (
         <>
             <DoneCard/>
-            <GoToHabitSummaryCard/>
+            <GoToHabitSummaryCard small={true}/>
         </>
     );
 }
